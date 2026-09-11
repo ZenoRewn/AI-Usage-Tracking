@@ -1,0 +1,26 @@
+# Author: Zeno Ren
+name: Build and test
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
+        with:
+          xcode-version: latest-stable
+      - run: swift --version
+      - run: swift test
+      - run: zsh Scripts/build-app.sh --universal
+      - run: ditto -c -k --keepParent "build/Usage Tracking.app" build/UsageTracking-CI.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: universal-app-build
+          path: build/UsageTracking-CI.zip
+          retention-days: 7

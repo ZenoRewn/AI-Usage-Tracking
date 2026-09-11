@@ -1,0 +1,38 @@
+# Author: Zeno Ren
+name: Build draft release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag, for example v0.4.4
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
+        with:
+          xcode-version: latest-stable
+      - name: Validate tag
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
+          test "$RELEASE_TAG" = "v$VERSION"
+      - run: swift test
+      - run: zsh Scripts/package-release.sh
+      - name: Create draft with download assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --title "Usage Tracking $RELEASE_TAG" --notes-file docs/PUBLIC_RELEASE.md

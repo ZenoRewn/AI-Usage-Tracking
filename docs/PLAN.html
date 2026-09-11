@@ -1,0 +1,405 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="Zeno Ren"><meta name="description" content="个人单机 macOS AI 工具用量监控：系统分析、功能与实施规划"><title>Usage Tracking · 系统规划 | Zeno Ren</title><style>
+:root{--ink:#142b36;--muted:#657680;--green:#087d74;--line:#dde5e7;--paper:#fff;--bg:#f3f6f6}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;min-width:1120px;color:var(--ink);background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",sans-serif;font-size:15px;line-height:1.8}a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}button{font:inherit;cursor:pointer}.sidebar{position:fixed;left:0;top:0;bottom:0;width:230px;border-right:1px solid var(--line);background:#fff;padding:30px 20px;overflow:auto}.brand{font-weight:750;font-size:19px;letter-spacing:-.4px}.brand-mark{display:inline-block;background:var(--green);color:white;border-radius:7px;width:29px;height:29px;text-align:center;line-height:29px;margin-right:9px}.sidebar .sub{color:var(--muted);font-size:12px;margin:9px 0 29px}.sidebar nav a{display:flex;gap:10px;padding:9px 8px;color:#526671;font-size:13px;border-radius:6px;line-height:1.5;margin-bottom:3px}.sidebar nav a span{color:#9ba9af;font-size:11px;padding-top:2px;min-width:18px}.sidebar nav a.active{background:#e9f5f2;color:#087166;font-weight:650}.sidebar footer{font-size:11px;color:var(--muted);margin-top:26px;border-top:1px solid var(--line);padding-top:18px}main{margin-left:230px;padding:34px 42px 80px;max-width:1620px}.topline{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);letter-spacing:.4px;margin-bottom:18px}.actions{display:flex;gap:16px;align-items:center}.actions button{padding:5px 14px;border:1px solid var(--line);border-radius:6px;background:white;color:var(--ink);font-size:12px}.hero{padding:34px 40px;background:#102f39;border-radius:16px;color:#fff;position:relative;overflow:hidden}.hero .eyebrow{font-size:11px;letter-spacing:2px;color:#7ed9c6;font-weight:700}.hero h1{font-size:38px;line-height:1.3;letter-spacing:-1.2px;margin:16px 0}.hero p{max-width:800px;color:#c6d6dc;font-size:15px;margin:0 0 19px}.hero .pills{display:flex;gap:8px}.hero .pills span{border:1px solid #43606a;color:#cce4e6;font-size:11px;padding:4px 11px;border-radius:20px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.metric{background:white;border:1px solid var(--line);border-radius:11px;padding:17px 20px}.metric b{display:block;font-size:23px;letter-spacing:-.5px}.metric span{font-size:12px;color:var(--muted)}.decision{background:#e7f3ef;border-left:4px solid #20957c;border-radius:0 8px 8px 0;padding:17px 22px;margin:18px 0 28px;font-size:14px}.decision b{color:#006958}section{background:white;border:1px solid var(--line);border-radius:12px;padding:29px 32px;margin-bottom:22px;scroll-margin-top:26px}h2{font-size:24px;letter-spacing:-.5px;margin:0 0 22px;padding-bottom:14px;border-bottom:1px solid var(--line);line-height:1.45}h3{font-size:18px;line-height:1.5;margin:27px 0 12px}p{margin:12px 0}ul,ol{padding-left:24px;margin:12px 0}li{margin-bottom:9px;padding-left:3px}strong{font-weight:650;color:#102f39}code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.86em;background:#f0f4f5;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}pre{background:#142e39;color:#e0eff0;padding:20px;overflow:auto;border-radius:8px}pre code{padding:0;background:none;color:inherit}.table-wrap{overflow-x:auto;margin:18px 0 23px;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.75}th{text-align:left;color:#365560;background:#f1f6f5;font-weight:650;padding:13px 15px;border-bottom:1px solid var(--line)}td{padding:13px 15px;border-bottom:1px solid #e8eef0;vertical-align:top;min-width:112px;overflow-wrap:anywhere}tr:last-child td{border-bottom:0}td:first-child{font-weight:600;color:#294955}tbody tr:nth-child(even){background:#fbfcfc}.architecture{border:1px solid #d8e6e5;background:#f7fbfa;padding:24px;border-radius:10px;margin:20px 0}.arch-label{font-size:10px;letter-spacing:1.8px;color:#698581;margin-bottom:14px}.sources{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.sources>div{padding:13px 7px;background:white;border:1px solid #d6e5e2;border-radius:8px;text-align:center;font-size:12px}.sources b{font-size:12px}.architecture small{display:block;color:var(--muted);font-size:11px;line-height:1.6;font-weight:400;margin-top:4px}.tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:10px;margin-top:8px;white-space:nowrap}.observed{background:#e1f3e9;color:#216848}.official{background:#e6edf9;color:#46669b}.pending{background:#fff1d7;color:#976515}.sources .uncertain{border-style:dashed;border-color:#d9b76d}.arrow{text-align:center;color:#75a197;line-height:1.3;font-size:22px;margin:5px 0}.layer{border:1px solid #d2e3de;background:#fff;border-radius:7px;text-align:center;padding:12px;font-size:13px}.layer small{display:inline;margin-left:10px}.layer.accent{background:#e5f3ee;color:#196d5f;font-weight:600}.storage{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}.storage>div{border-radius:7px;border:1px solid #b1cec5;background:white;text-align:center;padding:15px;font-size:14px;font-weight:650}.outputs{display:grid;grid-template-columns:1fr 2fr;gap:12px}.outputs>div{background:#163d47;color:white;border-radius:7px;padding:12px;text-align:center;font-size:14px}.outputs small{color:#bbd4d7}.diagram-note{font-size:10px;color:var(--muted);text-align:center;margin:17px 0 0}details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:25px;padding:24px 32px}summary{cursor:pointer;font-weight:650;font-size:18px}details h1{font-size:27px}.endnote{font-size:12px;color:var(--muted);text-align:center;margin-top:32px}.source-caption{font-size:12px;color:var(--muted);margin-bottom:22px}
+@media print{body{min-width:0;background:white;font-size:10pt}.sidebar,.topline,.actions{display:none}main{margin:0;padding:0;max-width:none}.hero{color:#142b36;background:#eef5f4;padding:25px}.hero p,.hero .eyebrow{color:#365560}.hero .pills span{color:#365560}.hero h1{font-size:28px}.metrics{gap:8px}.metric{padding:10px}section{padding:14px;border:0;border-radius:0;break-inside:auto;margin:0}h2,h3{break-after:avoid}.table-wrap{overflow:visible}thead{display:table-header-group}tr{break-inside:avoid}table{font-size:8pt}td,th{padding:7px;min-width:0}.architecture{break-inside:avoid}.tag{white-space:normal}a{color:#142b36}details{border:0;padding:0}.endnote{margin-top:20px}}
+</style></head><body>
+<aside class="sidebar"><div class="brand"><span class="brand-mark">M</span>Usage Tracking</div><div class="sub">MAC NATIVE · LOCAL FIRST<br>系统分析与功能规划 / v0.1</div><nav><a href="#section-1"><span>01</span>建议与范围</a><a href="#section-2"><span>02</span>必须先区分的四类数据</a><a href="#section-3"><span>03</span>四个参考项目如何使用</a><a href="#section-4"><span>04</span>采集能力与证据强度</a><a href="#section-5"><span>05</span>功能地图与优先级</a><a href="#section-6"><span>06</span>技术架构</a><a href="#section-7"><span>07</span>准确性规则：产品的核心</a><a href="#section-8"><span>08</span>本地性、权限与可靠性</a><a href="#section-9"><span>09</span>分阶段实施与退出标准</a><a href="#section-10"><span>10</span>TDD 与 Tidy First 实施策略</a><a href="#section-11"><span>11</span>当前已确认与仍需解决的事项</a><a href="#section-12"><span>12</span>参考来源</a><a href="#evidence"><span>↗</span>研究证据与源码</a></nav><footer>2026.09.09<br>Author: Zeno Ren<br>构建前规划 · 现状见 README</footer></aside>
+<main><div class="topline"><span>DESIGN BRIEF / 2026.09.09</span><div class="actions"><a href="SYSTEM_PLAN.md">设计源文档</a><a href="RESEARCH_EVIDENCE.md">证据源文档</a><button id="print">打印方案</button></div></div>
+<header class="hero"><div class="eyebrow">PERSONAL AI USAGE OBSERVATORY</div><h1>看清额度，更看清每个项目的投入。</h1><p>将 Codex App、Claude Code CLI 与 GitHub Copilot 的多个入口，整理为可核对的本地用量记录。以真实数据覆盖决定能力承诺。</p><div class="pills"><span>SwiftUI + AppKit</span><span>个人单机 · 数据本地保存</span><span>Token / 配额 / 成本 / 账单独立计量</span></div></header>
+<div class="metrics"><div class="metric"><b>3 个工具</b><span>Codex · Claude Code · Copilot</span></div><div class="metric"><b>5 个入口</b><span>App / CLI / VS Code 分别验证</span></div><div class="metric"><b>4 类计量</b><span>消耗 · 额度 · 估价 · 实扣</span></div><div class="metric"><b>本地优先</b><span>文件采集 + 本机 SQLite</span></div></div>
+<div class="decision"><b>建议：独立原生 App，选择性复用成熟实现。</b><br>菜单栏查看账户额度，主窗口分析跨工具项目。先验证 Copilot App 数据出口、去重与归属，再承诺五入口完整支持。</div>
+<p class="source-caption">本页保留初始规划；Usage Tracking 0.1 已实现可运行 App。当前已实现能力与限制，请以项目 README 和构建记录为准。</p>
+<section id="section-1"><h2>1. 建议与范围</h2><p>建议开发一个原生 macOS 应用，以“菜单栏快速看额度 + 主窗口分析项目投入”为核心。最值得投入的部分是跨入口的数据准确性：同一个项目用了哪些工具、各花多少 Token、是否接近额度、数据覆盖到哪里，以及哪些金额只是估算。</p>
+<p>用户已确认首版为个人单机、数据本地保存。实际覆盖五个入口：</p>
+<div class="table-wrap"><table><thead><tr><th>工具</th><th>使用入口</th><th>首版定位</th></tr></thead><tbody>
+<tr><td>Codex</td><td>App</td><td>本地项目、会话、Token 历史；按账户查询配额</td></tr>
+<tr><td>Claude Code</td><td>CLI</td><td>本地 Token 历史、项目统计；通过官方 statusLine 获取额度快照</td></tr>
+<tr><td>GitHub Copilot</td><td>VS Code</td><td>通过官方 OpenTelemetry 采集启用后的 agent/chat 用量</td></tr>
+<tr><td>GitHub Copilot</td><td>CLI</td><td>通过官方 OpenTelemetry 采集；兼容可验证的本地历史记录</td></tr>
+<tr><td>GitHub Copilot</td><td>App</td><td>账户额度共用；独立验证 App 的本地明细和遥测出口</td></tr>
+</tbody></table></div>
+<p>三个 Copilot 入口共享同一账户时，账户额度只显示一份，项目消耗按入口分开。Copilot 内调用 Claude 模型的记录仍归属 Copilot，不能算到 Claude Code 账户。</p>
+<p>默认支持 macOS 14+、Apple Silicon，后续按需求验证 Intel 构建。桌面优先，不规划手机适配。界面以中文为主，保留模型、Token、Credits 等准确原名。</p>
+<p>首版不包含团队后台、云同步、其他电脑日志、账号自动切换、API 代理、模型路由、自动购买额度或强制中断其他工具。远程/云端任务仅在明细实际同步到本机或有受支持接口时计入，界面注明覆盖范围。</p></section>
+<section id="section-2"><h2>2. 必须先区分的四类数据</h2><div class="table-wrap"><table><thead><tr><th>数据</th><th>回答的问题</th><th>单位与约束</th></tr></thead><tbody>
+<tr><td>用量流水</td><td>本项目实际处理了多少内容？</td><td>Input、Output、Cache Read、Cache Write、Reasoning Token，按来源口径归一化</td></tr>
+<tr><td>账户配额</td><td>现在还能用多少，何时重置？</td><td>百分比、Credits、请求额度、账户/模型/周期；不能换算成统一 Token 余额</td></tr>
+<tr><td>参考成本</td><td>如果按指定价格表计价，相当于多少钱？</td><td>带价格版本的估算金额；不等于订阅用户实际支出</td></tr>
+<tr><td>账单与实扣</td><td>服务商实际记账多少？</td><td>服务商账单/实扣 Credits；与本地估算分表保存、独立展示</td></tr>
+</tbody></table></div>
+<p>额外区分“上下文窗口占用”与“会话累计消耗”。压缩上下文后，占用可能下降，历史消耗不会因此减少。</p>
+<p><strong>2026 年 Copilot 的计费变化必须纳入模型。</strong> 当前 GitHub 文档以 Token 和模型成本折算 AI Credits；旧 Premium Requests 文档明确主要适用于 2026-06-01 后保留旧计费的特定年度 Pro/Pro+ 订阅。不能写死“每月 300/1,500 次”，应识别账户实际计费模式和返回的额度。AI Credits 的金额关系也不能反推唯一 Token 数，因为不同模型、缓存及计费政策不同。[O4][O5]</p></section>
+<section id="section-3"><h2>3. 四个参考项目如何使用</h2><p>以下为固定提交的源码核查结果，具体路径见证据文档。</p>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>已核实的能力</th><th>借鉴方式</th><th>边界及代价</th></tr></thead><tbody>
+<tr><td>CodexBar</td><td>Swift 原生菜单栏；多服务商配额；Codex/Claude 本地成本扫描；Codex 项目与会话聚合；Copilot 内部 API、Credits 与部分 Token 计费兼容</td><td>首要工程参考：Provider 适配、刷新状态机、Mac 生命周期、Codex 去重及分叉处理</td><td>范围已很大；核心包包含广泛服务商与 Cookie 等依赖；不能把整个库当作很轻的三工具 SDK</td></tr>
+<tr><td>token-tracker</td><td>Python 本地 CLI 报表；Claude/Codex/Kimi 解析；项目/模型/会话聚合；statusLine</td><td>借鉴报表维度、用户理解方式、解析样例</td><td>不是 Mac 原生 UI；所查 Codex adapter 将整段累计量绑定会话开始时间；不能直接用于准确跨日报表</td></tr>
+<tr><td>usage-monitor</td><td>Python Mac 菜单栏、Windows/Web；Claude statusLine；Codex 日志和 app-server 配额回退</td><td>借鉴无需 Cookie 的额度桥接、空数据/过期数据呈现</td><td>README 的“纯本地不调用 API”没有完整描述当前 app-server 路径；需按实际源码判断联网行为</td></tr>
+<tr><td>coding-tool</td><td>Node/Web 会话、项目浏览；Claude/Codex/Gemini；代理流量的实时 Token 统计</td><td>借鉴项目→会话的信息组织与可视化交互</td><td>代理统计只覆盖经其代理的请求；没有核实到目标 Copilot 三入口采集；代理与渠道管理超出本产品范围</td></tr>
+</tbody></table></div>
+<p>四个项目顶层均为 MIT，可在保留原版权和许可的条件下复用代码；实际采用的依赖、vendored 子目录仍需单独审核。Author: Zeno Ren 不能替代上游作者与许可声明。</p>
+<h3>3.1 自建、Fork 与复用决策</h3>
+<div class="table-wrap"><table><thead><tr><th>路线</th><th>适合情况</th><th>评估</th></tr></thead><tbody>
+<tr><td>直接使用已安装的 CodexBar</td><td>主要想查看三家账户额度和现有统计</td><td>即刻可用，也是本产品应比较的基准；其账户可用性尚未登录实测</td></tr>
+<tr><td>Fork CodexBar，增加跨入口项目分析</td><td>追求尽快继承成熟 Mac 功能，能接受长期跟踪上游</td><td>可选；先做小规模修改试验，评估 UI/核心耦合与升级冲突</td></tr>
+<tr><td>独立 Swift App，选择性移植适配器和测试思路</td><td>核心是五入口统一流水、项目归属、透明的数据覆盖</td><td><strong>推荐</strong>；避免把复杂 Provider UI、Cookie 和代理能力一并引入</td></tr>
+<tr><td>Tauri / Electron</td><td>未来明确需要跨平台、已有 Web 团队</td><td>本轮目标为单机 Mac，暂不优先；文件采集和菜单栏仍需原生桥接</td></tr>
+</tbody></table></div>
+<p>P0 中保留半天至一天的 CodexBar 复用验证：若可清晰抽取稳定接口则固定 revision 复用；否则移植必要模块并保留来源。Python/Node 参考项目用于理解行为，不要求用户安装这些运行时来使用成品。</p></section>
+<section id="section-4"><h2>4. 采集能力与证据强度</h2><p>“官方支持”表示文档存在；“本机观察”仅表示在有限样本中见到字段；两者都不等于五入口已完成端到端验收。</p>
+<div class="table-wrap"><table><thead><tr><th>入口/目标</th><th>首选数据源</th><th>可提供</th><th>证据状态</th><th>缺口与降级</th></tr></thead><tbody>
+<tr><td>Codex App 历史</td><td>实际配置的 CODEX_HOME 下 rollout / archived rollout；优先有响应 ID 的用量事件</td><td>Token 分类、模型、项目 cwd、会话/turn、部分来源与时间</td><td>本机样本观察到 token_usage_record 和 token_count</td><td>App 的实际 home 与版本需发现；云任务、删失历史、私有格式变更可能缺漏</td></tr>
+<tr><td>Codex 账户</td><td>本地 codex app-server 的 account/rateLimits/read；探测 account/usage/read 支持情况</td><td>窗口额度；部分服务认证下账户 Token 活动/每日汇总</td><td>当前官方文档确认；本机尚未调用</td><td>CLI 与 App 版本可不同；API-key-only 不支持该账户活动接口；失败时显示最后快照与时间</td></tr>
+<tr><td>Claude CLI 历史</td><td>CLAUDE_CONFIG_DIR / projects 下 JSONL</td><td>请求 Token、缓存、模型、cwd、会话时间</td><td>本机样本观察到 usage 字段</td><td>transcript 是内部格式；流式修订、子代理、模型切换需要版本化解析</td></tr>
+<tr><td>Claude CLI 配额</td><td>官方 statusLine 的 rate_limits 等白名单字段，保存每会话快照</td><td>5h/7d 额度、重置时间、上下文、CLI 报告成本</td><td>官方文档确认；未安装本产品桥接</td><td>无活跃会话时可能不更新；字段不存在/非订阅账户时不显示伪零值</td></tr>
+<tr><td>Copilot VS Code</td><td>官方 OTel file exporter；只消费 chat 调用明细</td><td>Input/Output/缓存/Reasoning（有值时）、模型、耗时、会话、Git 仓库属性</td><td>当前官方文档确认；本机 VS Code 已安装，遥测未验收</td><td>只覆盖启用后的受支持 agent/chat 路径；不能据此承诺所有 Tab 补全；多根/非 Git 项目需映射</td></tr>
+<tr><td>Copilot CLI</td><td>官方 OTel JSONL exporter；已有 session-state 仅作为经验证的补充</td><td>Token、模型、调用时长、conversation ID；nano_aiu 等源字段</td><td>官方文档确认；本机最近三个历史文件仅见 session.start</td><td>不能把空会话推论为 CLI 不支持 Token；启用前历史可能无法恢复</td></tr>
+<tr><td>Copilot App</td><td>独立验证设置、日志或嵌入运行时的 OTel；有相同 response/trace 身份时与 CLI 去重</td><td>验证通过后提供 App 项目/会话明细</td><td>已确认本机 GitHub Copilot App；未确认数据出口</td><td>不能因 CLI 有 OTel 就推断 App 自动继承；未打通时仅展示同账户额度和明细缺失状态</td></tr>
+<tr><td>Copilot 账户</td><td>官方可用个人账单/用量接口或导出优先；CodexBar 同类内部 API 为可选适配</td><td>Credits/请求额度/计划/周期，取决于账户实际响应</td><td>内部 API 的读取与解析已源码核实；未对本机账户验证</td><td>copilot_internal/user 非稳定公开契约；OAuth 应用权限兼容性需验证；有额度不代表有项目明细</td></tr>
+</tbody></table></div>
+<p>账户汇总与本地流水用于对照，不互相相加。账户还可能包含其他设备、云任务或未采集入口，因此不把两者差异自动视为解析错误，也不按比例把差额分摊到本地项目。</p>
+<h3>4.1 Codex App</h3>
+<ul>
+<li>先发现 App 真正使用的数据目录与版本，再读取日志。不能因 shell 中 codex 为某个版本，就认为 App 使用相同运行时。</li>
+<li>本机抽样看到 token_usage_record 含 response_id、thread_id、turn_id、root_turn_id、usage、turn_token_usage、thread_token_usage。这是比仅扫描最后一个 token_count 更有用的流水候选。</li>
+<li>优先采用经 fixture 验证的单响应 usage；累计快照作为校验/旧版回退。不能把三层用量再相加。</li>
+<li>thread/tokenUsage/updated 是活动线程通知，不是监听所有独立 App 进程的全局总线。启动一个新的 app-server 不保证能收到其他 App 的全部实时事件。[O1]</li>
+<li>account/usage/read 可作为账户层补充，字段允许 null，且需要支持的服务认证；不替代本地项目流水。[O1]</li>
+</ul>
+<h3>4.2 Claude Code CLI</h3>
+<ul>
+<li>历史统计从 transcript 中提取必要字段；官方说明 transcript 格式属于内部实现，必须按版本兼容。[O3]</li>
+<li>statusLine 提供额度和上下文快照；当前官方文档将 context_window.total_input_tokens 等描述为当前上下文信息，不能凭字段名 total 当作生命周期总消耗。[O2]</li>
+<li>桥接必须保留原有 statusLine：先展示具体配置差异，备份原值，受控转发相同 stdin，保持原 stdout；失败不阻塞 Claude。</li>
+<li>每个 session 独立快照，采用原子写入；额度按可靠账户身份合并。缺身份时按 source profile 隔离，不用“最近文件”猜账号。</li>
+<li>可选的 Claude OTel 作为后续实时细节源；如果用户已有遥测，不覆盖原 exporter。重复来源通过同一事件身份核对。</li>
+</ul>
+<h3>4.3 GitHub Copilot VS Code / CLI / App</h3>
+<ul>
+<li>VS Code 和 CLI 均有官方本地文件遥测路径，首选文件方式；当前阶段无需部署 Prometheus、Grafana 或本地 HTTP 服务。[O6][O7]</li>
+<li>关闭内容捕获，只接收计数、时刻、模型、会话、必要项目属性。远程 URL 即便来自元数据也可能含凭据，需去 userinfo、query 并脱敏。</li>
+<li>OTel 的父 invoke_agent 和子 chat 都可能含累计 Token；Token 流水只计入去重的 chat 调用层，父节点用于校验和项目元数据关联。</li>
+<li>CLI 文档明确：统计 AI unit 消耗时读取根 invoke_agent 的 nano_aiu，不能把所有父子 span 相加；github.copilot.cost 是模型计费倍率，<strong>不是美元金额</strong>。nano AIU 保留原单位，在缺少可核实转换契约时不标成 Credits。[O6]</li>
+<li>VS Code 的 session.id 是窗口级身份；gen_ai.conversation.id 是会话身份；不能互换。根 span 的 Git 仓库属性可传递到同 trace 的 chat 调用。[O7]</li>
+<li>App/CLI/VS Code 可能复用底层 agent 或会话，入口与采集源要分开建模；不能按“文件来自哪里”重复记三笔。</li>
+<li>若 App 无公开或可靠本地出口，首版可发布带“App 明细待支持”的预览版；在五入口都通过真实采集验证前，不宣称完整支持用户要求。</li>
+</ul></section>
+<section id="section-5"><h2>5. 功能地图与优先级</h2><div class="table-wrap"><table><thead><tr><th>能力</th><th>第一阶段可用版</th><th>后续增强</th></tr></thead><tbody>
+<tr><td>菜单栏</td><td>三家账户卡片；窗口/余额；重置；更新时间；异常标识</td><td>可配置最紧张账户、桌面 Widget</td></tr>
+<tr><td>总览</td><td>今日/7天/30天已观测 Token；参考成本；项目 Top；入口覆盖情况</td><td>自定义周期、趋势对比</td></tr>
+<tr><td>项目分析</td><td>跨工具合并；按模型/入口/日期拆分；项目别名和未归属区</td><td>monorepo 子项目、标签、项目预算</td></tr>
+<tr><td>会话分析</td><td>会话/turn 时间线、模型变化、Token 分类、主/子任务关系</td><td>已确认的状态通知、跳转原工具</td></tr>
+<tr><td>成本</td><td>版本化价格表、未知价格提示、参考成本与服务报告成本分开</td><td>用户导入账单、订阅分摊视图、价格变更重算</td></tr>
+<tr><td>账户额度</td><td>三工具实际可取的配额；Copilot 新旧计费模式适配</td><td>可选多 profile 支持、真实账单对照</td></tr>
+<tr><td>通知</td><td>额度阈值跨越、采集长期异常；冷却和合并</td><td>有足够有效样本后提供趋势预测</td></tr>
+<tr><td>数据质量</td><td>新鲜度、缺失原因、解析错误、价格/项目覆盖率</td><td>来源冲突定位、可导出的诊断摘要</td></tr>
+<tr><td>导出</td><td>CSV/JSON，默认脱敏、带计量说明和作者</td><td>自包含 HTML 周报</td></tr>
+<tr><td>设置</td><td>数据源向导、权限范围、暂停、开机启动、保留周期</td><td>高级 profile 和价格维护</td></tr>
+</tbody></table></div>
+<h3>5.1 界面信息架构</h3>
+<p><strong>菜单栏：</strong> 一次点击回答“哪家快用完、何时重置、数据新不新”。没有可靠配额时显示“未提供/待刷新”，不能显示健康的 0%。额度单位与窗口直接可见。</p>
+<p><strong>主窗口侧栏：</strong> 总览 / 项目 / 会话 / 账户额度 / 成本 / 数据源与诊断 / 设置。</p>
+<p><strong>项目详情：</strong> 项目名称 → 时间范围 → 已观测总量 → 工具/模型分布 → 会话列表 → 数据覆盖说明。打开某个数值能看到计量口径、来源、时间和是否估算。默认不展示聊天正文。</p>
+<p><strong>首次启动：</strong> 发现实际安装和目录 → 列出各入口能读到的字段 → 用户启用所需来源 → 展示 statusLine/OTel 的具体配置差异 → 执行可恢复修改 → 使用一段真实使用记录验证 → 展示可用/部分/未连接。不会仅因应用已安装就显示“连接成功”。</p>
+<h3>5.2 具体用户故事</h3>
+<ol>
+<li>我开始写代码前，看三家配额及最早重置时间。</li>
+<li>我想知道本周 Project A 在 Codex、Claude Code、Copilot 各消耗多少，并能区分 Copilot 的 VS Code 与 App。</li>
+<li>某天成本突然增加，我能下钻到模型、会话和调用，看到是缓存下降、输出增加还是价格变化。</li>
+<li>数据突然为零时，我能看出是没有使用、权限断开、遥测未启用，还是源格式不兼容。</li>
+<li>我只想导出某个项目的用量，不把用户名、绝对路径和提示词一起发出去。</li>
+</ol></section>
+<section id="section-6"><h2>6. 技术架构</h2><p>推荐 Swift 6 + SwiftUI + AppKit + Swift Charts + SQLite/GRDB。使用 Swift Package 划分纯领域逻辑与 macOS 交互；GRDB 等新增依赖在实施时固定版本并审核许可。普通单机查询无需独立服务端、向量数据库或 LLM。</p>
+<div class="architecture" role="img" aria-label="五个工具入口经适配器、去重和项目关联进入本机数据库；账户配额独立采集，最后由菜单栏与主窗口展示">
+<div class="arch-label">LOCAL SOURCES · 五个入口</div>
+<div class="sources">
+<div><b>Codex App</b><small>本地记录 · RPC</small><span class="tag observed">观察到字段</span></div>
+<div><b>Claude Code</b><small>JSONL · statusLine</small><span class="tag observed">观察到字段</span></div>
+<div><b>Copilot VS Code</b><small>OTel 文件</small><span class="tag official">官方文档支持</span></div>
+<div><b>Copilot CLI</b><small>OTel 文件</small><span class="tag official">官方文档支持</span></div>
+<div class="uncertain"><b>Copilot App</b><small>出口与项目归属</small><span class="tag pending">P0 待验证</span></div>
+</div>
+<div class="arrow">↓</div>
+<div class="layer">来源适配器 <small>版本探测 / 权限 / 增量游标</small></div>
+<div class="arrow">↓</div>
+<div class="layer accent">白名单提取 → 事件去重 → 计量归一 → 项目关联</div>
+<div class="arrow">↓</div>
+<div class="storage"><div>本机 SQLite <small>规范化流水 · 事务与索引</small></div><div>账户快照 <small>独立采集 · 单位与周期 · 新鲜度</small></div></div>
+<div class="arrow">↓</div>
+<div class="layer">聚合查询 · 版本化估价 · 数据质量 · 通知规则</div>
+<div class="arrow">↓</div>
+<div class="outputs"><div>菜单栏<small>额度与重置</small></div><div>SwiftUI 主窗口<small>项目 / 会话 / 趋势 / 导出</small></div></div>
+<p class="diagram-note">架构规划图 · 箭头表示拟议数据流，不代表已完成集成。Author: Zeno Ren</p>
+</div>
+<p>该图只包含规划组件；Copilot App 的箭头不表示已打通。</p>
+<div class="table-wrap"><table><thead><tr><th>模块</th><th>责任</th></tr></thead><tbody>
+<tr><td>MonitorDomain</td><td>计量口径、流水身份、配额状态、金额类型、质量状态；纯函数优先</td></tr>
+<tr><td>SourceAdapters</td><td>Codex、Claude、Copilot 各版本解析；只读源文件；能力探测</td></tr>
+<tr><td>Ingestion</td><td>文件增量、偏移检查点、修订、幂等、源优先级、错误隔离</td></tr>
+<tr><td>ProjectResolver</td><td>cwd / Git common-dir / 仓库属性 / 人工规则，保留映射来源</td></tr>
+<tr><td>MonitorStore</td><td>SQLite 事务、索引、迁移、聚合、保留与重建</td></tr>
+<tr><td>QuotaService</td><td>同账户独立窗口、受限联网查询、缓存、重置与过期状态</td></tr>
+<tr><td>CostEngine</td><td>有效期价格、缓存分类、未知模型、参考成本及服务报告金额</td></tr>
+<tr><td>MacIntegration</td><td>菜单栏、开机启动、通知、文件选择、Keychain、后台生命周期</td></tr>
+<tr><td>MonitorUI</td><td>查询模型、筛选、图表、详情、质量说明</td></tr>
+</tbody></table></div>
+<p>采集调度使用 actor 隔离；UI 更新在 MainActor；限制同时扫描文件数与每轮字节数，取消任务可在检查点停止。P0 不引入可动态执行任意第三方代码的插件系统。</p>
+<h3>6.1 关键数据实体</h3>
+<div class="table-wrap"><table><thead><tr><th>实体</th><th>关键字段/关系</th></tr></thead><tbody>
+<tr><td>ProviderAccount</td><td>service、issuer/host、account/workspace ID、identityConfidence；源未知时可空</td></tr>
+<tr><td>SourceInstance</td><td>tool、surface、home/profile、app/CLI version、parserVersion、capabilities、consentScope</td></tr>
+<tr><td>Session / Turn</td><td>source session ID、parent/fork/root turn、开始/结束、项目关联；源状态与推断状态分开</td></tr>
+<tr><td>UsageEvent</td><td>source event/response/trace-span ID、eventTime、observedAt、account、surface、session/turn、model、Token 分类、计量语义、revision、quality</td></tr>
+<tr><td>QuotaSnapshot</td><td>account、limit ID、scope、unit、used/limit/remaining、window、resetsAt、capturedAt、freshness</td></tr>
+<tr><td>BillingObservation</td><td>原始单位与金额、currency、billingMode、period、来源、是否服务商实扣</td></tr>
+<tr><td>Project / ProjectAlias</td><td>稳定 project ID、canonical root、Git common-dir、来源路径、手工映射有效时间</td></tr>
+<tr><td>PriceRate / CostEstimate</td><td>model 精确 ID、service、tier、region（适用时）、分类单价、有效期、priceVersion、推定说明</td></tr>
+<tr><td>IngestionCheckpoint</td><td>file identity、generation、byte offset、最后完整行、parserVersion，与流水同事务提交</td></tr>
+<tr><td>SourceHealth</td><td>最后成功、最新事件、解析错误计数、缺失字段、覆盖起点、恢复动作</td></tr>
+</tbody></table></div>
+<p>数字未知使用 null；源明确返回 0 才显示 0。无限额度使用独立状态，不能以“0/0”构造百分比。账户配额 key 包含账户、workspace、模型池和周期，不以 email/显示名作为唯一标识。</p>
+<p>身份分层：使用工具是 Copilot、消费账户是 GitHub、底层模型提供方可能是 Anthropic/OpenAI；这三项分开保存。</p></section>
+<section id="section-7"><h2>7. 准确性规则：产品的核心</h2><h3>7.1 Token 计量</h3>
+<ul>
+<li><strong>Claude：</strong> 常见 transcript 下，input_tokens、cache_read_input_tokens、cache_creation_input_tokens 是不同输入部分。按明确契约汇总；cache_creation 子分类是总量拆分时只计一次。</li>
+<li><strong>Codex：</strong> 常见记录的 input_tokens 已包含 cached_input_tokens；不能再加一遍缓存命中。reasoning_output_tokens 通常是 output_tokens 的子集；本机又出现 cache_write_input_tokens，必须用当前版本样本验证其包含关系，不套用旧版公式。</li>
+<li><strong>Copilot：</strong> 根据 exporter/版本的 GenAI 字段语义转换；仅字段名称相同不足以证明缓存是否已包含。保留原始计数字段的白名单副本，验证后再转换到统一输入分类。</li>
+<li>统一内部分类建议为 uncachedInput、cacheReadInput、cacheWriteInput、output、reasoningSubset；同一计量规范验证通过后才能合计。暂不能确定包含关系时保留 nativeTotal 和“不完全可比”标识。</li>
+<li>Token 总量展示的是已观测模型处理量，不代表代码产出、任务难度或工具效率。</li>
+</ul>
+<h3>7.2 去重、修订与分叉</h3>
+<ol>
+<li>单响应 ID/trace+span 优先；完整事件才提交，遇到半行等下一次读取。</li>
+<li>同一请求的流式片段、usage 修订和最终结果更新同一条逻辑流水；不能只取第一条，也不能每个片段加一遍。</li>
+<li>Codex 新响应事件与旧累计快照不叠加；OTel chat 与父 invoke_agent 不叠加；OTel histogram 也不再累加到请求流水。</li>
+<li>分叉继承的父会话历史只计一次，新的实际模型请求应计入。按响应身份或可验证分叉基线处理；父记录缺失且无法确定基线时标记未解析覆盖，不能盲目把全部继承量当新消耗。</li>
+<li>subagent / 多线程日志中可能交错不同累计序列，不能对整文件统一做差；以明确 session/thread/lineage 分组。</li>
+<li>累计值降低可能是重置、压缩、修订或不同 lineage。分段并记录原因；不要仅 max(差值,0) 后丢弃所有异常证据。</li>
+<li>同一 App 会话通过多个入口或导出源出现时，跨源去重必须依赖稳定身份。没有共同身份时选择一个权威来源，其他只作核验。</li>
+<li>文件偏移只能实现同文件幂等；跨文件复制、归档、改名还需要事件身份。确实无身份时以文件 generation+offset 作本地 key，并标注跨源去重限制。</li>
+</ol>
+<h3>7.3 时间与项目归属</h3>
+<ul>
+<li>以用量事件发生时间归账；不能把 23:50 开始、次日结束的会话总量全部记在第一天。</li>
+<li>仅有稀疏累计快照时，增量发生在一个时间区间内；跨日无法精确拆分就标记时间归属近似，不按线性插值伪造精度。</li>
+<li>时间以 UTC 保存，报表按用户时区转换；跨夏令时、时区切换和重放都要一致。</li>
+<li>默认按真实 cwd 和 Git common-dir 合并同仓库 worktree，保留工作区子维度。不要只用目录 basename，不从编码目录名不可逆地猜完整路径。</li>
+<li>Git remote URL 是关联候选，不能把所有同 remote 的独立 clone 自动合为一项目。人工确认的别名规则可覆盖自动结果。</li>
+<li>VS Code multi-root、非 Git、无 cwd 和来源仅有仓库属性时，显示仓库级或未归属，不把前台窗口当成可靠项目证据。</li>
+<li>一个会话跨多个项目工作时，缺少逐调用工作目录则只能做会话级归属；若未来支持人工分摊，必须标明规则及有效期。</li>
+</ul>
+<h3>7.4 成本与覆盖</h3>
+<p>参考成本 = 各互斥 Token 分类 × 对应价格 / 1,000,000；按模型、实际服务、价格有效期与 tier 选择价格。Cache Write 如有 5m/1h 费率区分则分别计价。工具调用费、请求费等仅在有明确数据时单列。</p>
+<ul>
+<li>不自动把未知模型套用“同系列”价格；显示未定价 Token 与价格覆盖率。用户可指定价格，但标为用户配置。</li>
+<li>不把 Claude statusLine 的 cost、Codex 本地估价或 Copilot github.copilot.cost 当成银行实际支出。</li>
+<li>不把订阅费 + API 等效金额相加为总账单。订阅分摊只能作为显式分析规则，单独显示。</li>
+<li>以价格版本生成可复算的 Estimate；更新价格表不静默重写历史。</li>
+<li>“项目归属率”= 有项目归属的已观测 Token / 已观测 Token；“价格覆盖率”也以已观测量为分母。不能称为账户全部用量覆盖率。</li>
+<li>账户配额与本地用量的时间范围和单位不同，仅在范围、账户、单位都一致时做对照，始终保留差异原因。</li>
+</ul></section>
+<section id="section-8"><h2>8. 本地性、权限与可靠性</h2><p>“数据保存在本机”不等于完全断网：历史解析、项目查询和图表可离线；用户启用账户配额查询、价格更新、应用更新时会连接对应服务。提供离线模式，界面区分本地事件与远程快照。</p>
+<h3>8.1 最小数据采集</h3>
+<ul>
+<li>源日志读取过程中只提取白名单元数据，不复制完整 transcript、提示词、代码或工具参数到数据库。</li>
+<li>不自动读取浏览器 Cookie 或其他应用的凭据库。Claude 优先 statusLine；Codex 优先自身 app-server；Copilot 内部 API 作为单独可选连接能力。</li>
+<li>若需要本产品自己的 GitHub OAuth 应用，独立注册和验证权限；不能照搬其他项目的 client ID 并假定可访问 Copilot 内部端点。密码/令牌不会进入分析文档、调试日志或导出。</li>
+<li>自有凭据使用 Keychain，数据文件限制当前用户访问。SQLite 默认并非数据库级加密，使用 OS 文件权限与 FileVault；需要更高隔离时再评估 SQLCipher。</li>
+<li>先选择数据目录，再申请相应文件读取权限；首版无需屏幕录制、辅助功能或默认 Full Disk Access。</li>
+<li>用户项目文件中的文本、日志内容和 repo URL 都视为不可信数据，不执行其中指令；导出时 HTML 转义，CSV 防公式注入。</li>
+</ul>
+<h3>8.2 持久化和调度</h3>
+<ul>
+<li>存储建议：~/Library/Application Support/Usage Tracking/。配置、规范化数据库、桥接快照、源游标分目录。</li>
+<li>外部数据库仅用只读方式；不能修改 Codex/Claude/Copilot 的 DB，也不能破坏其 WAL 锁。对于可能产生 sidecar 的读取方式在 P0 验证，优先受支持接口或安全快照。</li>
+<li>本产品 SQLite 使用 WAL、单写 actor、事务内同时提交事件与检查点；重启可重放，数据库损坏可从仍可用的源重新构建。</li>
+<li>FSEvents/文件变化通知作触发，并用低频增量核对补偿丢失事件；禁止每秒全目录递归扫描。</li>
+<li>活跃变化合并 0.5–2 秒；安静时低频核对；配额默认约 5 分钟查询，手动刷新仍限速。睡眠停止后台查询，唤醒抖动后补采；429 遵从 Retry-After 和指数退避。</li>
+<li>单个适配器超时或格式错误不影响其他工具。关闭主窗口仍可在菜单栏运行；完全退出后不采集，重新启动尝试从源补齐。</li>
+<li>app-server 子进程具有超时、输出大小上限和明确回收；不创建或提交模型任务。需验证其初始化是否触发插件/凭据刷新及副作用。</li>
+<li>默认保留 90 天明细、长期日汇总，可配置。源日志和价格版本缺失后不能承诺完整历史重算；由保留策略说明限制。</li>
+</ul>
+<h3>8.3 配额、通知与故障状态</h3>
+<p>状态至少包括：未发现、未启用、已连接、部分数据、过期、权限不足、需重新登录、格式不兼容、暂时失败。更新时间和最新事件时间分别显示。</p>
+<p>配额过重置时刻不直接显示 0%；显示“等待新窗口数据”。同账户、同窗口的最后有效值可作历史参考，不能把其他账号的新快照覆盖进来。</p>
+<p>通知以 70/90/100% 等用户可调阈值跨越触发；只对新鲜可靠数据发额度提醒，按账户+窗口去重、冷却，重置确认后重新布防。当前采集没有证据时不承诺“等待审批/任务完成”实时提醒；推测状态必须带标识。</p>
+<h3>8.4 发布方式</h3>
+<p>首版走直接分发 .app / .dmg，采用 Developer ID 签名与 notarization；开发阶段可本地签名验证。Mac App Store 的沙箱与跨工具目录读取需要独立论证，不作为第一版发布前提。开机启动用 SMAppService；自动更新可选 Sparkle，启用前配置更新签名与发布管道。作者标识放在 About、README 和导出报告中，上游许可保留在 Third-Party Notices。</p></section>
+<section id="section-9"><h2>9. 分阶段实施与退出标准</h2><p>以下是单名熟悉 Swift/macOS 的工程师的粗估，包含正常开发和验证，不是已测工期；外部接口、账号权限和 App 私有格式会影响时间。</p>
+<div class="table-wrap"><table><thead><tr><th>阶段</th><th>预计投入</th><th>主要产物</th><th>必须满足的退出标准</th></tr></thead><tbody>
+<tr><td>P0 数据可行性</td><td>3–5 工作日</td><td>五入口能力探测、脱敏 fixture、数据字段契约、CodexBar 复用验证、连接方案</td><td>Codex/Claude 真实记录可解析；Copilot VS Code/CLI 各一段真实遥测能对账；Copilot App 出口得到“可采/有限/不可采”的证据；明确各账户配额可用性</td></tr>
+<tr><td>P1 本地流水与项目</td><td>5–8 工作日</td><td>Swift Package、增量索引、SQLite、来源诊断、项目/会话聚合</td><td>重新导入不增量；跨日正确；新旧格式不双计；worktree 可合并、未知项目可见；断电/中断恢复无遗漏</td></tr>
+<tr><td>P2 Mac 可用版</td><td>5–8 工作日</td><td>菜单栏、总览、项目、会话、成本、账户额度、设置与通知</td><td>主窗口关闭继续采集；数据新鲜度真实；连接配置可回退；支持入口在正常使用时能持续更新</td></tr>
+<tr><td>P3 五入口与发布验收</td><td>3–5 工作日</td><td>兼容修正、App 适配收尾、性能结果、签名包、用户说明</td><td>用户五入口逐一有验收结果；若 App 明细仍不可采，只发布显式降级预览；稳定运行、脱敏导出、清理本产品数据不影响源工具</td></tr>
+</tbody></table></div>
+<p>合计约 16–26 工作日，即约 3–5 个工作周。P0 后重新估算；不能以完成漂亮界面替代五入口数据验证。</p>
+<h3>9.1 最先实施的顺序</h3>
+<ol>
+<li>先做 Codex App 的单响应流水、重复与跨日 fixture；本机已有最有价值的样本。</li>
+<li>同步安排到同一 P0 工作序列中验证 Copilot App 和 VS Code/CLI OTel，尽早暴露最大不确定性，不等 UI 完成。</li>
+<li>完成 Claude 历史解析与不破坏现有 statusLine 的桥接。</li>
+<li>三工具进入同一项目账本后，再开发成本/额度总览和菜单栏。</li>
+<li>最后补通知、性能与分发。每一步保留可运行的最小纵向切片。</li>
+</ol>
+<h3>9.2 非功能验收目标</h3>
+<p>以下为拟定目标，尚未测量：</p>
+<div class="table-wrap"><table><thead><tr><th>指标</th><th>目标与测试条件</th></tr></thead><tbody>
+<tr><td>正确性</td><td>脱敏金标准 fixture 的计数、去重和归账完全一致；缺失信息被显式标记</td></tr>
+<tr><td>增量延迟</td><td>文件写入完整记录后 p95 ≤ 5 秒；不包含源 exporter 自身缓冲时间</td></tr>
+<tr><td>查询体验</td><td>100 万条规范化事件、90 天常用聚合查询 p95 ≤ 300ms，记录机器与索引配置</td></tr>
+<tr><td>资源</td><td>Apple Silicon 上闲置 CPU 平均 &lt; 1%，稳态 RSS 目标 &lt; 200MB，导入时单独测峰值</td></tr>
+<tr><td>初次导入</td><td>流式处理 1GB 合成日志，进度可见/可取消/可恢复，先报告实测吞吐，不预设虚假秒数</td></tr>
+<tr><td>持续运行</td><td>72 小时正常使用 + 睡眠唤醒、断网恢复、文件轮转；无持续增长和重复统计</td></tr>
+<tr><td>数据安全</td><td>日志/数据库/导出中无原始提示词或凭据；仅本产品自有目录可清理</td></tr>
+</tbody></table></div></section>
+<section id="section-10"><h2>10. TDD 与 Tidy First 实施策略</h2><p>本轮只做规划，不给文档编写与实现镜像的测试。进入开发后，优先针对数据错误的可观察行为建立测试；每个适配器按 Red → Green → Refactor 开发。</p>
+<p>先建立最小脱敏 fixture 和预期账本，再写解析器，不边解析边“猜测正确结果”。结构整理与行为变更分开提交；先消除必要的耦合，再增加功能，不预先搭建复杂框架。</p>
+<p>必须覆盖的验收案例：</p>
+<div class="table-wrap"><table><thead><tr><th>类型</th><th>具体案例</th></tr></thead><tbody>
+<tr><td>Codex</td><td>同一 response 同时出现在 token_usage_record/token_count 只计一次；缓存/Reasoning 不重复；交错线程独立差分</td></tr>
+<tr><td>分叉</td><td>父 100、分叉继承 100、子新增 20，总量 120；缺父基线时不伪造准确值</td></tr>
+<tr><td>Claude</td><td>同 request/message 的 usage 多次修订，只保留最终有效计量；cache creation 总量与子分类不双计</td></tr>
+<tr><td>Copilot</td><td>两个 chat 各 10/20，父总量 30，最终为 30；AI unit 按根节点规则独立处理</td></tr>
+<tr><td>跨源</td><td>App/CLI 共同 response 或同 trace 重放不增量；无稳定 ID 时保留明确权威源选择</td></tr>
+<tr><td>时间</td><td>23:59 与 00:01 两次请求分到两天；时区变更只改变视图分桶；稀疏累计跨日标近似</td></tr>
+<tr><td>文件</td><td>半行、坏行、追加、轮转、截断、搬移、归档、不同路径重复副本；重启重复导入总量不变</td></tr>
+<tr><td>项目</td><td>同名不同根不合并；worktree 合并；symlink 去重；multi-root/无 Git 保持未归属或已确认规则</td></tr>
+<tr><td>配额</td><td>null 不变 0；无限不渲染 0/0；重置到期不假清零；同 email 不同 workspace 不串数</td></tr>
+<tr><td>价格</td><td>未知模型显示未定价；缓存 tier 和价格日期正确；订阅费不与等效成本重复求和</td></tr>
+<tr><td>恢复</td><td>插入事件与游标更新之间强制终止，重启后无漏无重；迁移失败不破坏可恢复数据库</td></tr>
+<tr><td>Mac 集成</td><td>statusLine 原输出不变、失败不阻塞、配置精确回退；窗口关闭、睡眠、权限撤回与通知冷却</td></tr>
+<tr><td>隐私</td><td>export 白名单、HTML 转义、CSV 公式防护；源 payload 中的提示词和令牌不进入持久化</td></tr>
+</tbody></table></div>
+<p>最终以每个真实入口的一次正常会话，对照工具原生显示与本产品流水；明确误差来自采集、时间边界、模型计价还是源统计口径。</p></section>
+<section id="section-11"><h2>11. 当前已确认与仍需解决的事项</h2><p>已确认：范围为个人单机五入口；工作区目前没有应用代码；四个项目顶层 MIT；Mac/Swift 环境和相关工具存在；Codex/Claude 有可用字段样本；Copilot VS Code/CLI 有官方本地遥测路径。</p>
+<p>尚未确认：本机 Codex App 实际运行时与支持的 RPC 版本；Claude 订阅配额字段在当前登录方式下的可用性；Copilot 账户计费模式与可访问接口；Copilot App 的本地采集出口；VS Code multi-root 的逐调用项目归属；历史日志保留与缺失范围。</p>
+<p>这些缺口应通过 P0 技术验证回答；现在无需继续让用户做架构选择。当前最合理的下一步是建立数据探测和脱敏 fixture，再以事实决定完整版本承诺。</p></section>
+<section id="section-12"><h2>12. 参考来源</h2><p>固定提交、源码定位、本机观察和文档核验范围见 <a href="RESEARCH_EVIDENCE.md">研究证据</a>。</p>
+<ul>
+<li><a href="https://learn.chatgpt.com/docs/app-server">O1：OpenAI Codex App Server</a></li>
+<li><a href="https://code.claude.com/docs/en/statusline">O2：Claude Code Status Line</a></li>
+<li><a href="https://code.claude.com/docs/en/monitoring-usage">O3：Claude Code Monitoring</a></li>
+<li><a href="https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals">O4：GitHub Copilot 个人用量计费</a></li>
+<li><a href="https://docs.github.com/en/copilot/reference/copilot-billing/request-based-billing-legacy/copilot-requests">O5：Copilot 旧请求计费</a></li>
+<li><a href="https://docs.github.com/en/copilot/reference/cli-command-reference">O6：Copilot CLI 命令与 OpenTelemetry</a></li>
+<li><a href="https://code.visualstudio.com/docs/agents/guides/monitoring-agents">O7：VS Code Agent OpenTelemetry</a></li>
+<li><a href="https://docs.github.com/en/copilot/concepts/agents/github-copilot-app">O8：GitHub Copilot App</a></li>
+<li><a href="https://docs.github.com/en/rest/copilot/copilot-usage-metrics">O9：Copilot Usage Metrics REST</a></li>
+</ul>
+<p>Author: Zeno Ren</p></section><details id="evidence"><summary>展开研究证据、固定提交与本机核验边界</summary><h1>研究证据与核验边界</h1>
+<p>Author: Zeno Ren</p>
+<p>&gt; 本文件保留构建前的规划与研究。Usage Tracking 0.1 已开始实现，当前交付与限制见 <a href="BUILD_STATUS.md">构建记录</a> 和 <a href="../README.md">README</a>。</p>
+<p>核查日期：2026-09-09。本文区分源码证据、官方文档、本机抽样与尚未验证的集成能力。不以 README 宣传、安装成功或字段存在代替端到端验收。</p>
+<h2>1. 参考项目快照</h2>
+<p>通过 HTTPS shallow clone 获取公开源码，仅检查文件；未执行这些项目的安装脚本或应用。临时源码保存在 /tmp/ai-tool-monitor-research/，未纳入产品目录。</p>
+<div class="table-wrap"><table><thead><tr><th>标识</th><th>用户提供的仓库</th><th>本轮 HEAD</th><th>提交时间</th><th>顶层许可</th></tr></thead><tbody>
+<tr><td>R1</td><td>steipete/CodexBar</td><td>928166f899471bbdcb72210641cdec91324d0154</td><td>2026-09-08，-07:00</td><td>MIT，Peter Steinberger</td></tr>
+<tr><td>R2</td><td>stormzhang/token-tracker</td><td>360d29c39cae046c7740be53411d574c28a713e4</td><td>2026-08-25，-07:00</td><td>MIT，stormzhang</td></tr>
+<tr><td>R3</td><td>yanowo/usage-monitor</td><td>34dc1c3cc6be7ec7dab2366b2ca9ceebdb7440d4</td><td>2026-05-27，+08:00</td><td>MIT，lollapalooza；README 标注上游 aqua5230/usage</td></tr>
+<tr><td>R4</td><td>CooperJiang/coding-tool</td><td>a80f2e60cc27b1b511d2aae27b87c97082e77c75</td><td>2025-12-08，+08:00</td><td>MIT</td></tr>
+</tbody></table></div>
+<p>部分 README 仍使用历史名称 yanowo/usage、CooperJiang/cc-tool；本轮从用户给定 URL 获取，并以提交 SHA 固定证据。</p>
+<p>顶层许可证核查不等于全部依赖许可证审核。当前产物为独立研究与规划，没有复制上游实现代码；后续实际复用需保留相应原版权、许可与文件来源。</p>
+<h2>2. 可复核的源码定位</h2>
+<h3>R1 CodexBar</h3>
+<ul>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/README.md">README 与 Mac 能力</a>：macOS 14+、Swift、菜单栏、Cost Usage、Usage &amp; Spend、更新与权限说明。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/Package.swift">Swift Package</a>：Swift tools 6.2、CodexBarCore 可导入库，但核心依赖同时涉及 SweetCookieKit、Crypto、CQuickJS 等，不能假设是纯轻量数据层。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/Sources/CodexBarCore/Vendored/CostUsage/CostUsageScanner%2BProjects.swift#L16">Codex 项目和会话聚合</a>：buildCodexSessionBreakdownsFromCache；第 88 行起为 buildCodexProjectBreakdownsFromCache。因此不能将 CodexBar 描述成“完全没有项目统计”。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/Sources/CodexBarCore/Vendored/CostUsage/CostUsageScanner%2BForkCoverage.swift">分叉覆盖处理</a>：缺少父基线的分叉在 priced totals 中被隔离，证明该场景需要明确的覆盖策略。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/Sources/CodexBarCore/Providers/Copilot/CopilotUsageFetcher.swift#L42">CopilotUsageFetcher</a>：使用 /copilot_internal/user；第 69 行解析 quotaResetDate，第 74 行处理 creditsUsed，第 95 行处理 tokenBasedBilling/unlimited，无真实百分比时不造假条。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/Sources/CodexBarCore/CopilotUsageModels.swift">CopilotUsageModels</a>：解析 credits_used、token_based_billing、quota_reset_date；区分占位 0/0、无限、缺失百分比。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/docs/copilot.md">Copilot Provider 文档</a>：Device Flow、内部用量 API、可选 Cookie 预算读取。该文档写“Reset dates are not provided”，但当前 Swift 源码已解析 quotaResetDate；规划以源码能力为准，并把账户实际是否返回重置日期留待验证。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/docs/codex.md">Codex Provider</a>：OAuth、CLI RPC、Web extras 各自的边界；本产品优先评估 CLI RPC，避免默认跨应用凭据读取。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/docs/claude.md">Claude Provider</a>：OAuth/PTY/Web/Admin API 路径及各类降级；这些不是都需要进入本产品首版。</li>
+<li><a href="https://github.com/steipete/CodexBar/blob/928166f899471bbdcb72210641cdec91324d0154/LICENSE">MIT 许可</a>。</li>
+</ul>
+<h3>R2 token-tracker</h3>
+<ul>
+<li><a href="https://github.com/stormzhang/token-tracker/blob/360d29c39cae046c7740be53411d574c28a713e4/README.md">README</a>：Claude/Codex/Kimi、本地报告、项目/模型/会话、statusLine。</li>
+<li><a href="https://github.com/stormzhang/token-tracker/blob/360d29c39cae046c7740be53411d574c28a713e4/src/token_tracker/adapters/codex.py#L210">Codex adapter</a>：读取最后 total_token_usage，并在第 281 行把总量写到 session_ts。这里支持“会话累计”，不能直接拿来做事件发生日的精确统计。</li>
+<li>同文件从 input_tokens 扣除 cached_input_tokens，再单列 cache；明确 reasoning_output_tokens 为 output_tokens 子集。该处理帮助识别重复计数风险，但不能替代对当前新字段的验证。</li>
+<li><a href="https://github.com/stormzhang/token-tracker/blob/360d29c39cae046c7740be53411d574c28a713e4/src/token_tracker/adapters/claude.py">Claude adapter</a>：从 assistant.message.usage 提取 input/output/cache，优先 cwd，并用 message/request ID 去重。</li>
+<li><a href="https://github.com/stormzhang/token-tracker/blob/360d29c39cae046c7740be53411d574c28a713e4/src/token_tracker/adapters/types.py#L5">types.py</a>：normalize_pct 在旧重置时刻到达后返回 0。本产品不沿用“到期就自动确认已归零”，改为等待新快照。</li>
+<li><a href="https://github.com/stormzhang/token-tracker/blob/360d29c39cae046c7740be53411d574c28a713e4/LICENSE">MIT 许可</a>。</li>
+</ul>
+<h3>R3 usage-monitor</h3>
+<ul>
+<li><a href="https://github.com/yanowo/usage-monitor/blob/34dc1c3cc6be7ec7dab2366b2ca9ceebdb7440d4/README.md">README</a>：Mac/Python/Web、Claude statusLine、Codex 本地日志、价格缓存。</li>
+<li><a href="https://github.com/yanowo/usage-monitor/blob/34dc1c3cc6be7ec7dab2366b2ca9ceebdb7440d4/usage_statusline.py">usage_statusline.py</a>：从 stdin 接收 JSON，临时文件 + replace 原子落盘。原样存整份 JSON 的实现不直接照搬，本产品改为白名单字段。</li>
+<li><a href="https://github.com/yanowo/usage-monitor/blob/34dc1c3cc6be7ec7dab2366b2ca9ceebdb7440d4/codex_loader.py">codex_loader.py</a>：load_rate_limits 先试 app-server，然后 logs DB 与 session 日志。第 331 行构造 account/rateLimits/read。此行为超出了 README 对“无 API 调用”的简单描述。</li>
+<li>同文件历史 loader 也有读取会话末尾累计量的实现，不能假定具备精确逐事件时间归账。</li>
+<li><a href="https://github.com/yanowo/usage-monitor/blob/34dc1c3cc6be7ec7dab2366b2ca9ceebdb7440d4/LICENSE">MIT 许可</a>。</li>
+</ul>
+<h3>R4 coding-tool</h3>
+<ul>
+<li><a href="https://github.com/CooperJiang/coding-tool/blob/a80f2e60cc27b1b511d2aae27b87c97082e77c75/README.md">README</a>：会话管理、项目、代理、动态渠道、WebSocket 实时用量。</li>
+<li><a href="https://github.com/CooperJiang/coding-tool/blob/a80f2e60cc27b1b511d2aae27b87c97082e77c75/src/server/services/codex-parser.js#L153">codex-parser.js</a>：通过末尾 token_count 读取累计统计。</li>
+<li><a href="https://github.com/CooperJiang/coding-tool/blob/a80f2e60cc27b1b511d2aae27b87c97082e77c75/src/server/services/codex-sessions.js">codex-sessions.js</a>：cwd/Git 元信息驱动项目和会话组织。</li>
+<li><a href="https://github.com/CooperJiang/coding-tool/blob/a80f2e60cc27b1b511d2aae27b87c97082e77c75/src/server/proxy-server.js">proxy-server.js</a>：通过被代理响应流中的 usage 统计请求消耗。这不能直接覆盖绕过代理的原生工具流量。</li>
+<li><a href="https://github.com/CooperJiang/coding-tool/blob/a80f2e60cc27b1b511d2aae27b87c97082e77c75/package.json">package.json</a>：Node/Express/ws，版本 2.2.0；根 test 脚本是占位失败脚本。本轮未执行测试，也不据此断言所有子目录都没有测试。</li>
+<li><a href="https://github.com/CooperJiang/coding-tool/blob/a80f2e60cc27b1b511d2aae27b87c97082e77c75/LICENSE">MIT 许可</a>。</li>
+</ul>
+<h2>3. 已实际打开的官方文档</h2>
+<div class="table-wrap"><table><thead><tr><th>标识</th><th>官方来源</th><th>支持的结论</th></tr></thead><tbody>
+<tr><td>O1</td><td><a href="https://learn.chatgpt.com/docs/app-server">Codex App Server</a></td><td>account/rateLimits/read、account/usage/read、活动线程 tokenUsage；账户活动字段可能 null；API-key-only 不适用该活动接口</td></tr>
+<tr><td>O2</td><td><a href="https://code.claude.com/docs/en/statusline">Claude statusLine</a></td><td>rate_limits、resets_at、cost 与上下文 JSON；本地状态栏不消耗 API Token</td></tr>
+<tr><td>O3</td><td><a href="https://code.claude.com/docs/en/monitoring-usage">Claude Monitoring</a></td><td>官方 OTel、默认内容捕获边界；transcript 内部格式会变更</td></tr>
+<tr><td>O4</td><td><a href="https://docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals">Copilot 个人用量计费</a></td><td>AI Credits 与模型/Token 成本；Credits 不是统一 Token 数</td></tr>
+<tr><td>O5</td><td><a href="https://docs.github.com/en/copilot/reference/copilot-billing/request-based-billing-legacy/copilot-requests">旧请求计费</a></td><td>特定保留旧计费的年度 Pro/Pro+ 订阅边界；不可拿旧额度代表全部账户</td></tr>
+<tr><td>O6</td><td><a href="https://docs.github.com/en/copilot/reference/cli-command-reference">Copilot CLI reference</a></td><td>/usage 的模型 Token；OTel file exporter；父子 span；nano_aiu；cost 为倍率非货币</td></tr>
+<tr><td>O7</td><td><a href="https://code.visualstudio.com/docs/agents/guides/monitoring-agents">VS Code OTel</a></td><td>file exporter、chat span Token、Git 元属性、窗口与 conversation 身份、默认不捕获正文</td></tr>
+<tr><td>O8a</td><td><a href="https://docs.github.com/en/copilot/concepts/agents/github-copilot-app">GitHub Copilot App 概念</a></td><td>App 的项目/多会话能力；未据此确认其本地 Token 出口</td></tr>
+<tr><td>O8b</td><td><a href="https://docs.github.com/en/copilot/how-tos/github-copilot-app/agent-sessions">App Agent Sessions</a></td><td>每会话独立 workspace；项目选择；不能忽略 worktree/隔离目录归属</td></tr>
+<tr><td>O9</td><td><a href="https://docs.github.com/en/rest/copilot/copilot-usage-metrics">Copilot Usage Metrics REST</a></td><td>组织/企业用量报告路线；不能默认个人账户具有组织接口权限或本地项目明细</td></tr>
+<tr><td>O10</td><td><a href="https://docs.github.com/en/copilot/concepts/enterprise/opentelemetry">Copilot OpenTelemetry 概念</a></td><td>跨客户端遥测概念与默认内容捕获边界，仍需逐客户端验证</td></tr>
+</tbody></table></div>
+<p>取数方式：OpenAI 文档使用官方文档搜索和页面获取；Claude Markdown、GitHub 和 VS Code 文档通过 HTTPS 抓取正文。旧 Copilot 页面部分重定向到 legacy 路径，引用采用已核实的新路径。官方网页会更新，本表为当日状态。</p>
+<p>重要的可实现配置线索（仅记录，未修改用户设置）：</p>
+<ul>
+<li>Copilot CLI：COPILOT_OTEL_FILE_EXPORTER_PATH 可开启本地 JSONL exporter；OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT 默认为 false。</li>
+<li>VS Code：github.copilot.chat.otel.enabled、exporterType=file、outfile；内容捕获开关保持关闭。</li>
+<li>Claude：statusLine 从 stdin 接收 JSON；需兼容用户现有显示与桥接。</li>
+<li>Codex：先初始化 app-server，再探测只读方法支持情况；不创建推理任务。</li>
+</ul>
+<h2>4. 本机有限检查</h2>
+<p>检查仅包括版本、安装目录/应用包元数据，以及每工具至多三个近期 JSONL 文件的头部/尾部限量抽样。未打印或保存提示词、响应正文、凭据、实际 Token 数量或个人项目路径；仅输出字段名/记录类型。未读取 auth.json、Keychain 或浏览器 Cookie，未启用遥测、安装 hook、启动登录或调用账户 API。</p>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>本轮观察</th></tr></thead><tbody>
+<tr><td>工作区</td><td>起始为空目录，没有已有应用实现</td></tr>
+<tr><td>系统</td><td>macOS 26.6.2，arm64</td></tr>
+<tr><td>Swift</td><td>6.3.3；xcodebuild 可执行路径存在，尚未验证完整 Xcode 构建</td></tr>
+<tr><td>Claude Code CLI</td><td>2.1.266；projects 目录存在</td></tr>
+<tr><td>Codex CLI</td><td>0.145.0；sessions、archived_sessions 存在；不能代表 Codex App 内置运行时</td></tr>
+<tr><td>Copilot CLI</td><td>1.0.83-5；session-state 存在</td></tr>
+<tr><td>VS Code</td><td>1.136.2；尚未核实 Copilot 扩展版本及其当前 OTel 设置</td></tr>
+<tr><td>GitHub Copilot App</td><td>/Applications/GitHub Copilot.app，1.1.16，bundle ID com.github.githubapp</td></tr>
+<tr><td>名称相近的 App</td><td>/Applications/Copilot.app 为 Microsoft 365 Copilot；不能误识别为 GitHub Copilot</td></tr>
+<tr><td>Codex 相关 App</td><td>/Applications/CodexMac.app 为 ink.zeno.codexmac，0.1；该包不证明用户所说 Codex App 的实际安装位置，应按正在使用的 App/runtime 发现</td></tr>
+<tr><td>现有 CodexBar</td><td>0.57.0 已安装；安装存在不代表已接通三家账户</td></tr>
+</tbody></table></div>
+<h3>字段抽样</h3>
+<ul>
+<li>Claude：发现 assistant.message.usage，包含 input_tokens、output_tokens、cache_read_input_tokens、cache_creation_input_tokens，以及 cache_creation、service_tier、speed 等可选字段。</li>
+<li>Codex：既有 event_msg/token_count，也有顶层 token_usage_record。后者 payload 含 response_id、session_id、thread_id、turn_id、root_turn_id、usage、turn_token_usage、thread_token_usage。</li>
+<li>Codex Token 字段包含 input_tokens、cached_input_tokens、cache_write_input_tokens、output_tokens、reasoning_output_tokens、total_tokens。不能用老解析器忽略新字段后声称完整。</li>
+<li>Copilot：最近三个抽样 events.jsonl 仅观察到 session.start，包含版本/producer/sessionId/startTime。此样本不足以确认历史用量支持或不支持；需真正包含模型调用的样本或开启后的 OTel 验证。</li>
+</ul>
+<p>抽样采用文件头尾窗口，可能看到同一行两次，抽样记录数不用于任何用量统计。</p>
+<h2>5. 尚未完成的验证</h2>
+<ol>
+<li>五个入口的真实会话与本产品采集流水对账。</li>
+<li>本机 Codex App 的实际 home、运行时及 account/usage/read 兼容性。</li>
+<li>Claude 当前账户 rate_limits 是否返回及现有 statusLine 安全组合。</li>
+<li>Copilot VS Code/CLI 的实际 exporter schema、缓存包含语义与完整性。</li>
+<li>Copilot App 的 OTel/文件数据出口；应用启动环境与 CLI 环境是否相通。</li>
+<li>个人 GitHub 账户当前计费模式、内部 API 可用性及本产品自有 OAuth 的权限条件。</li>
+<li>每个来源的身份关联、项目归属、跨入口重复和历史缺失范围。</li>
+<li>资源、性能、72 小时稳定性、签名安装和权限恢复。</li>
+</ol>
+<p>以上是进入实施的验证任务，不是本轮已经实现的能力。</p></details><footer class="endnote">Author: Zeno Ren · 2026-09-09 · 离线阅读页，无外部脚本、字体或分析追踪。</footer></main>
+<script>
+document.getElementById('print').addEventListener('click',()=>window.print());
+document.querySelector('a[href="#evidence"]').addEventListener('click',()=>{document.getElementById('evidence').open=true;});
+const links=[...document.querySelectorAll('nav a')];
+const observer=new IntersectionObserver(entries=>{for(const e of entries){if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.hash==='#'+e.target.id));}}},{rootMargin:'-5% 0px -70% 0px',threshold:0});
+document.querySelectorAll('main section').forEach(s=>observer.observe(s));
+</script></body></html>

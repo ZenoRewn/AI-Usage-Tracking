@@ -1,0 +1,24 @@
+# Author: Zeno Ren
+.build/
+.swiftpm/
+build/
+dist/
+.DS_Store
+*.sqlite*
+*.db*
+*.jsonl
+!Tests/**/Fixtures/*.jsonl
+.env
+.env.*
+*.log
+*.backup
+*.p12
+*.p8
+*.pem
+*.key
+*.mobileprovision
+*.provisionprofile
+*.xcarchive/
+DerivedData/
+# Historical UI capture contains local usage data; not a public product asset.
+docs/menu-panel-v0.2.png
