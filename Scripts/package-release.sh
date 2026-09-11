@@ -2,13 +2,13 @@
 # Author: Zeno Ren
 set -euo pipefail
 cd "${0:A:h:h}"
-zsh Scripts/build-app.sh --universal
+zsh Scripts/build-app.sh
 usage_version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)"
-usage_stem="Usage-Tracking-${usage_version}-universal"
+usage_stem="Usage-Tracking-${usage_version}-arm64"
 usage_app="$PWD/build/Usage Tracking.app"
 for usage_binary in UsageTracking usage-tracking; do
   usage_arches="$(lipo -archs "$usage_app/Contents/MacOS/$usage_binary")"
-  [[ "$usage_arches" == *arm64* && "$usage_arches" == *x86_64* ]] || { print -u2 "Missing universal architecture: $usage_binary"; exit 1; }
+  [[ "$usage_arches" == "arm64" ]] || { print -u2 "Expected arm64-only binary: $usage_binary"; exit 1; }
 done
 mkdir -p dist
 usage_stage="$(mktemp -d "$PWD/build/release-stage.XXXXXX")"

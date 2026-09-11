@@ -1,4 +1,4 @@
-# Usage Tracking v0.4.4
+# Usage Tracking v0.4.5
 
 Author: Zeno Ren
 
@@ -12,7 +12,7 @@ Author: Zeno Ren
 
 ## 下载
 
-推荐下载 `Usage-Tracking-0.4.4-universal.dmg`，打开后将 App 拖入 Applications。也可使用 ZIP。Universal 包含 Apple Silicon 和 Intel，要求 macOS 14+；无需安装 Xcode、Python、Node 或 Docker。
+推荐下载 `Usage-Tracking-0.4.5-arm64.dmg`，打开后将 App 拖入 Applications。也可使用 ZIP。仅支持 Apple Silicon（M 系列，arm64）和 macOS 14+，无需 Rosetta，不提供 Intel 版本；无需安装 Xcode、Python、Node 或 Docker。
 
 **此预览版尚未经过 Apple Developer ID 签名和公证**，使用本地 ad-hoc 签名。首次打开可能出现无法验证开发者的系统提示；核对本仓库来源后，按 [安装说明](https://github.com/ZenoRewn/AI-Usage-Tracking/blob/main/INSTALL.md) 使用“系统设置 → 隐私与安全性 → 仍要打开”。不需要关闭系统全局安全功能。
 
@@ -20,6 +20,6 @@ Author: Zeno Ren
 
 ## 验证与范围
 
-62 项测试通过；Universal 二进制、打包及签名校验通过。Apple Silicon 已启动验证；Intel 为交叉编译版本，未完成真机验收。
+62 项测试通过；App 与辅助程序均仅包含 arm64，打包、签名和 Apple Silicon 启动检查通过。
 
 账户查询需要相应 CLI 已安装并登录。Claude 配额依赖可选 statusLine 桥接；Copilot 部分入口需配置本地遥测。Token 为已采集记录，参考成本不是订阅账单，未连接入口不会虚构用量。完整范围见 README。

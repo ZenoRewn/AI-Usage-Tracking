@@ -2,7 +2,7 @@
 
 Author: Zeno Ren
 
-> 本文保留 v0.1 的验收记录。当前版本见 [v0.4.4 更新](RELEASE_0.4.4.md)，今日项目排行见 [v0.4.3 更新](RELEASE_0.4.3.md)，紧凑额度见 [v0.4.2 更新](RELEASE_0.4.2.md)，Dock 行为见 [v0.4.1 更新](RELEASE_0.4.1.md)。
+> 本文保留 v0.1 的验收记录。当前发行版见 [v0.4.5 更新](RELEASE_0.4.5.md)，用量整合见 [v0.4.4 更新](RELEASE_0.4.4.md)，今日项目排行见 [v0.4.3 更新](RELEASE_0.4.3.md)，紧凑额度见 [v0.4.2 更新](RELEASE_0.4.2.md)，Dock 行为见 [v0.4.1 更新](RELEASE_0.4.1.md)。
 
 日期：2026-09-09。状态：可运行的本地预览版，已安装到 `/Applications/Usage Tracking.app`。
 

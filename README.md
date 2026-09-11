@@ -4,15 +4,15 @@ Author: Zeno Ren
 
 原生 macOS AI 编程工具用量监控：菜单栏查看额度，主窗口分析项目、会话、模型和 Token。个人单机使用，数据保存在本机。
 
-当前版本：**0.4.4 预览版**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
+当前版本：**0.4.5 预览版**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
 
 ## 下载与安装
 
-**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.4.4/Usage-Tracking-0.4.4-universal.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.4.4/Usage-Tracking-0.4.4-universal.zip)
+**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.4.5/Usage-Tracking-0.4.5-arm64.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.4.5/Usage-Tracking-0.4.5-arm64.zip)
 
-macOS 14+，Universal（Apple Silicon + Intel）。打开 DMG，把 App 拖到“应用程序”即可安装；启动后默认在**顶部菜单栏**显示图标，点击“打开工作台”查看主界面。运行 App 不需要开发环境。
+macOS 14+，**仅支持 Apple Silicon（M 系列，arm64）**，无需 Rosetta，不提供 Intel 版本。打开 DMG，把 App 拖到“应用程序”即可安装；启动后默认在**顶部菜单栏**显示图标，点击“打开工作台”查看主界面。运行 App 不需要开发环境。
 
-本次预览版采用 ad-hoc 签名，尚未经过 Apple Developer ID 签名和公证；首次打开可能被 macOS 拦截。请按 [安装说明](INSTALL.md) 核对来源，并使用系统对该 App 提供的“仍要打开”。Release 附带 SHA-256 校验值。Intel 版本经过交叉编译与架构检查，尚未在 Intel 真机验收。
+本次预览版采用 ad-hoc 签名，尚未经过 Apple Developer ID 签名和公证；首次打开可能被 macOS 拦截。请按 [安装说明](INSTALL.md) 核对来源，并使用系统对该 App 提供的“仍要打开”。Release 附带 SHA-256 校验值。
 
 MIT License · Author: Zeno Ren。第三方品牌素材的原始许可见 [第三方声明](THIRD_PARTY_NOTICES.md)。
 
@@ -26,7 +26,7 @@ zsh Scripts/build-app.sh
 open "build/Usage Tracking.app"
 ```
 
-构建脚本本地签名并验证 .app；会将上一份构建移到 build/previous，避免原位覆写正在运行的二进制。`zsh Scripts/package-release.sh` 构建 Universal App、DMG、ZIP 和 SHA-256 文件。发布流程见 [发布维护说明](docs/PUBLISHING.md)。
+构建脚本本地签名并验证 .app；会将上一份构建移到 build/previous，避免原位覆写正在运行的二进制。`zsh Scripts/package-release.sh` 构建 arm64 App、DMG、ZIP 和 SHA-256 文件。发布流程见 [发布维护说明](docs/PUBLISHING.md)。
 
 ## 已实现
 
@@ -130,6 +130,7 @@ swift run -c release usage-tracking export /tmp/usage-report.json
 
 ## 文档
 
+- [v0.4.5 Apple Silicon 公开发行版](docs/RELEASE_0.4.5.md)
 - [v0.4.4 用量概览整合与成本切换](docs/RELEASE_0.4.4.md)
 - [v0.4.3 今日 Top 3 项目](docs/RELEASE_0.4.3.md)
 - [v0.4.2 紧凑额度卡片与手动刷新](docs/RELEASE_0.4.2.md)

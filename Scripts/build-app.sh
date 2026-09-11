@@ -2,11 +2,9 @@
 # Author: Zeno Ren
 set -euo pipefail
 cd "${0:A:h:h}"
-usage_swift_args=(-c release -Xswiftc -gnone)
-if [[ "${1:-}" == "--universal" ]]; then
-  usage_swift_args+=(--arch arm64 --arch x86_64)
-elif [[ $# -gt 0 ]]; then
-  print -u2 'Usage: Scripts/build-app.sh [--universal]'
+usage_swift_args=(-c release --arch arm64 -Xswiftc -gnone)
+if [[ $# -gt 0 ]]; then
+  print -u2 'Usage: Scripts/build-app.sh (Apple Silicon only)'
   exit 2
 fi
 swift build "${usage_swift_args[@]}"

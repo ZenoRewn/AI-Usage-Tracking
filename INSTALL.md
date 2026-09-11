@@ -2,7 +2,7 @@
 
 Author: Zeno Ren
 
-要求 macOS 14 或更新版本。Universal 安装包同时包含 Apple Silicon（M 系列）和 Intel 架构。运行 App 不需要安装 Xcode、Python、Node 或 Docker。
+要求 macOS 14 或更新版本，且为 Apple Silicon（M 系列，arm64）Mac。仅提供原生 arm64 安装包，无需 Rosetta，不支持 Intel Mac。运行 App 不需要安装 Xcode、Python、Node 或 Docker。
 
 1. 从 [GitHub Releases](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest) 下载 `.dmg`，或选择 `.zip`。
 2. DMG：打开后把 `Usage Tracking.app` 拖到 `Applications`；ZIP：解压后把 App 移到“应用程序”。
@@ -11,14 +11,14 @@ Author: Zeno Ren
 
 ## 首次打开
 
-v0.4.4 使用本地 ad-hoc 签名，**尚未经过 Apple Developer ID 签名和公证**。首次下载打开时，macOS 可能提示无法验证开发者。
+v0.4.5 使用本地 ad-hoc 签名，**尚未经过 Apple Developer ID 签名和公证**。首次下载打开时，macOS 可能提示无法验证开发者。
 
 确认下载来自本仓库的 Release 后，可在尝试打开 App 后进入“系统设置 → 隐私与安全性”，使用该 App 对应的“仍要打开”。按系统提示完成确认。无需关闭系统的 Gatekeeper 或修改全局安全设置。
 
 Release 附带 SHA-256 校验文件。把校验文件与 DMG、ZIP 放在同一目录后，可运行：
 
 ```sh
-shasum -a 256 -c Usage-Tracking-0.4.4-universal-SHA256SUMS.txt
+shasum -a 256 -c Usage-Tracking-0.4.5-arm64-SHA256SUMS.txt
 ```
 
 ## 数据连接
@@ -31,7 +31,7 @@ shasum -a 256 -c Usage-Tracking-0.4.4-universal-SHA256SUMS.txt
 
 ## English
 
-Requires macOS 14+. Download the Universal DMG or ZIP from this repository's Releases. Drag the app to Applications and launch it. The app starts in the **menu bar only**; choose **打开工作台** to show its main window and Dock icon.
+Requires macOS 14+ on Apple Silicon (M-series, arm64). Intel Macs are not supported; Rosetta is not required. Download the arm64 DMG or ZIP from this repository's Releases. Drag the app to Applications and launch it. The app starts in the **menu bar only**; choose **打开工作台** to show its main window and Dock icon.
 
 This preview is ad-hoc signed and is **not Apple-notarized**. After verifying the download source, use the app-specific **Open Anyway** option in System Settings → Privacy & Security if macOS blocks the first launch. Do not disable system-wide security protections.
 

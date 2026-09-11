@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing version tag, for example v0.4.4
+        description: Existing version tag, for example v0.4.5
         required: true
         type: string
 permissions:
@@ -29,8 +29,10 @@ jobs:
         run: |
           VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
           test "$RELEASE_TAG" = "v$VERSION"
+      - run: test "$(uname -m)" = arm64
       - run: swift test
       - run: zsh Scripts/package-release.sh
+      - run: test "$(lipo -archs 'build/Usage Tracking.app/Contents/MacOS/UsageTracking')" = arm64
       - name: Create draft with download assets
         env:
           GH_TOKEN: ${{ github.token }}
