@@ -30,9 +30,11 @@ struct MenuGlassSurface: ViewModifier {
     @ViewBuilder func body(content: Content) -> some View {
         if #available(macOS 26.0, *) {
             content.glassEffect(.regular.tint(MenuPalette.background.opacity(0.12)),
-                                in:RoundedRectangle(cornerRadius:cornerRadius))
+                                in:RoundedRectangle(cornerRadius:cornerRadius,style:.continuous))
+                .clipShape(RoundedRectangle(cornerRadius:cornerRadius,style:.continuous))
         } else {
-            content.background(.ultraThinMaterial,in:RoundedRectangle(cornerRadius:cornerRadius))
+            content.background(.ultraThinMaterial,in:RoundedRectangle(cornerRadius:cornerRadius,style:.continuous))
+                .clipShape(RoundedRectangle(cornerRadius:cornerRadius,style:.continuous))
         }
     }
 }

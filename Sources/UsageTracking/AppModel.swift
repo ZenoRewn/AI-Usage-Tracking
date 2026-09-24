@@ -237,7 +237,7 @@ struct DailyUsage: Identifiable {
     private func checkNotifications() {
         guard config.notifications else { return }
         for q in displayedQuotas where !q.isStale() && q.usedPercent >= 90 {
-            let key = "\(q.id):\(q.resetsAt?.timeIntervalSince1970 ?? 0):90"
+            let key = "\(q.id):\(q.confirmedResetsAt?.timeIntervalSince1970 ?? 0):90"
             guard notified.insert(key).inserted else { continue }
             let content = UNMutableNotificationContent(); content.title = "\(q.tool.title) 额度提醒"; content.body = "\(q.title) 已使用 \(Int(q.usedPercent))%。"; content.sound = .default
             UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: StableID.hash(key), content: content, trigger: nil))

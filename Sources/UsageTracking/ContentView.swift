@@ -257,7 +257,7 @@ struct QuotasView: View {
                                 Spacer(minLength:0)
                             }.padding(.vertical,4)
                         }
-                        HStack { Text(q.source); Spacer(); if let reset = q.resetsAt { Text(reset < Date() ? "等待新窗口数据" : "重置：" + reset.formatted(.dateTime.month().day().hour().minute())) } }.font(.caption).foregroundStyle(.secondary)
+                        HStack { Text(q.source); Spacer(); if q.hasUnconfirmedReset { Text("下次重置时间待确认") } else if let reset = q.resetsAt { Text(reset < Date() ? "等待新窗口数据" : "重置：" + reset.formatted(.dateTime.month().day().hour().minute())) } }.font(.caption).foregroundStyle(.secondary)
                         Text("采集于 " + q.capturedAt.formatted(.dateTime.month().day().hour().minute())).font(.system(size:11)).foregroundStyle(.tertiary)
                     }.padding(.vertical,7)
                 }

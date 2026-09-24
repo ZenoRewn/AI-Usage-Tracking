@@ -1,2 +1,2 @@
 // Author: Zeno Ren
-public enum UsageCoreVersion { public static let current = "0.5.2" }
+public enum UsageCoreVersion { public static let current = "0.5.3" }

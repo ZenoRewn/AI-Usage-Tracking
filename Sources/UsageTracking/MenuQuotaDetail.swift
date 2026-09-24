@@ -82,8 +82,12 @@ struct MenuQuotaDetail: View {
             Text("采集于 " + quota.capturedAt.formatted(.dateTime.month().day().hour().minute().second()))
                 .font(.caption).foregroundStyle(.secondary)
             if let reset = quota.resetsAt {
-                Text((reset <= summary.now ? "服务返回的重置时间已过：" : "服务重置时间：") + reset.formatted(.dateTime.month().day().hour().minute()))
+                Text((quota.hasUnconfirmedReset ? "服务返回时间（待确认）：" : reset <= summary.now ? "服务返回的重置时间已过：" : "服务重置时间：") + reset.formatted(.dateTime.month().day().hour().minute()))
                     .font(.caption).foregroundStyle(.secondary)
+                if quota.hasUnconfirmedReset {
+                    Text("本次查询未提供可确认的下次重置时间；用量仍按最近读数显示，不据此自动清零。")
+                        .font(.caption).foregroundStyle(MenuPalette.warning)
+                }
             }
         }
     }

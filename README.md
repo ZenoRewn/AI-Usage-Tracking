@@ -4,11 +4,11 @@ Author: Zeno Ren
 
 原生 macOS AI 编程工具用量监控：菜单栏查看额度，主窗口分析项目、会话、模型和 Token。个人单机使用，数据保存在本机。
 
-当前版本：**0.5.2 预览版（Build 12）**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
+当前版本：**0.5.3 预览版（Build 13）**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
 
 ## 下载与安装
 
-**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.2/Usage-Tracking-0.5.2-arm64.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.2/Usage-Tracking-0.5.2-arm64.zip)
+**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.3/Usage-Tracking-0.5.3-arm64.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.3/Usage-Tracking-0.5.3-arm64.zip)
 
 macOS 14+，**仅支持 Apple Silicon（M 系列，arm64）**，无需 Rosetta，不提供 Intel 版本。打开 DMG，把 App 拖到“应用程序”即可安装；启动后默认在**顶部菜单栏**显示图标，点击“打开工作台”查看主界面。运行 App 不需要开发环境。
 
@@ -95,7 +95,7 @@ open "build/Usage Tracking.app"
 
 修改间隔立即按上次完成时间重算计划，当前请求不重叠执行。启动/恢复采集立即刷新；暂停阻止新的自动查询，正在进行的账户查询会完成。手动刷新同时覆盖本地与账户，失败保留已有快照，连续失败以 5 / 10 / 20 / 40 / 60 分钟退避，与所选间隔取较长者。账户页显示下次刷新时间和独立错误，不弹出后台错误对话框。
 
-Claude 额度随 statusLine 实际更新，本地读取周期不能让 Claude 主动产生新快照。超过 15 分钟或达到服务返回重置时刻的额度仍标为旧快照，即使主动选择了较长刷新周期。
+Claude 额度随 statusLine 实际更新，本地读取周期不能让 Claude 主动产生新快照。超过 15 分钟或跨过已确认的重置时刻，额度仍标为旧快照，即使主动选择了较长刷新周期。Copilot RPC 在采集时就已过去的重置提示单独标为“待确认”，不会因此把刚读取的用量涂成灰色。
 
 Copilot 在 `tokenBasedBilling` 开启时按照本机 VS Code 的展示口径，将账户返回的额度计数显示为 Credits，不从 Token/参考 USD 换算，不猜测缩放系数。缺失绝对计数显示“—”。[字段依据与边界](docs/QUOTA_SEMANTICS.md)。
 
@@ -108,6 +108,8 @@ Copilot 在 `tokenBasedBilling` 开启时按照本机 VS Code 的展示口径，
 额度环在低于 80% 时为常规色，80–89% 为提醒色，90% 及以上为警示色，同时显示状态文字；通知阈值仍为原有的 90%。旧快照弱化圆环并标识，缺少额度不显示为 0%。倒计时只用于新鲜且重置时间有效的快照；重置时刻已过显示“等待新窗口”，不会自动清零。完整窗口名、服务重置时间与采集时间可在点击详情中核对。
 
 菜单保留 macOS 26/27 的原生 Liquid Glass，较旧系统采用超薄材质。设计稿的灰阶用于半透明叠层，进度环采用随使用比例变化的薄荷绿、暖黄和红色；品牌图标保持中性色。
+
+状态栏面板的宿主窗口使用透明背景、20pt 连续圆角裁剪与系统阴影，避免玻璃内容之外出现方形底板。普通工作台窗口不受此设置影响。
 
 开发者可运行 `zsh Scripts/build-menu-preview.sh`，再打开 `build/Usage Menu Preview.app`，在独立窗口检查深浅色、正常/缺失/未就绪/旧快照/异常状态。它使用虚构数据、独立临时目录，禁用采集器与账户查询；验收范围为展示与导航，不执行连接安装或系统设置。它用于原生视图验收，不代表真实账户服务已验收。
 
@@ -136,6 +138,7 @@ swift run -c release usage-tracking export /tmp/usage-report.json
 
 ## 文档
 
+- [v0.5.3 Copilot 额度状态与窗口圆角修复](docs/RELEASE_0.5.3.md)
 - [v0.5.2 菜单配色与进一步紧凑化](docs/RELEASE_0.5.2.md)
 - [v0.5.1 紧凑额度与工作台信息层级](docs/RELEASE_0.5.1.md)
 - [v0.5.0 菜单面板与交互优化](docs/RELEASE_0.5.0.md)

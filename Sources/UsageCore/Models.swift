@@ -80,7 +80,15 @@ public struct QuotaWindow: Codable, Sendable, Identifiable {
         self.id = id; self.tool = tool; self.title = title; self.usedPercent = usedPercent; self.resetsAt = resetsAt; self.capturedAt = capturedAt; self.source = source
         self.amounts = amounts
     }
-    public func isStale(at now: Date = Date()) -> Bool { now.timeIntervalSince(capturedAt) > 900 || (resetsAt.map { $0 <= now } ?? false) }
+    /// Copilot RPC can return the query time as resetDate. That is not a confirmed
+    /// upcoming reset and does not invalidate the usage returned by that same read.
+    public var hasUnconfirmedReset: Bool {
+        tool == .copilot && id.hasPrefix("copilot-rpc:") && (resetsAt.map { $0 <= capturedAt } ?? false)
+    }
+    public var confirmedResetsAt: Date? { hasUnconfirmedReset ? nil : resetsAt }
+    public func isStale(at now: Date = Date()) -> Bool {
+        now.timeIntervalSince(capturedAt) > 900 || (confirmedResetsAt.map { $0 <= now } ?? false)
+    }
     public static func mergingScan(_ scanned: [QuotaWindow], current: [QuotaWindow]) -> [QuotaWindow] {
         var result = scanned
         for prefix in ["rpc:", "copilot-rpc:"] {

@@ -54,6 +54,7 @@ struct MenuPopover: View {
         }.padding(16).frame(width:464)
         .foregroundStyle(MenuPalette.text).tint(MenuPalette.accent)
         .modifier(MenuGlassSurface())
+        .background(MenuWindowChrome().frame(width:0,height:0))
     }
     private func show(_ page: AppPage) {
         showWorkbench(page)

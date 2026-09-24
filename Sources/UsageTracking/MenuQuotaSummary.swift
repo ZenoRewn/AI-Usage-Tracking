@@ -46,6 +46,7 @@ struct MenuQuotaSummary {
         return resetText(for:primary)
     }
     func resetText(for quota: QuotaWindow) -> String {
+        if quota.hasUnconfirmedReset { return "重置时间待确认" }
         guard let reset = quota.resetsAt else { return "未提供重置时间" }
         let seconds = reset.timeIntervalSince(now)
         guard let minutes = Int(exactly:ceil(seconds / 60)) else { return "重置时间无效" }
@@ -84,7 +85,12 @@ struct MenuQuotaSummary {
             lines.append("采集于 " + quota.capturedAt.formatted(.dateTime.month().day().hour().minute().second()))
             if now.timeIntervalSince(quota.capturedAt) > 900 { lines.append("快照较旧，等待刷新；不会自动归零。") }
             if let reset = quota.resetsAt {
-                lines.append(reset <= now ? "服务返回的重置时间已过，新窗口尚待确认。" : "重置：" + reset.formatted(.dateTime.month().day().hour().minute()))
+                if quota.hasUnconfirmedReset {
+                    lines.append("服务未提供可确认的下次重置时间；重置时间待确认。")
+                    lines.append("服务返回时间：" + reset.formatted(.dateTime.month().day().hour().minute()))
+                } else {
+                    lines.append(reset <= now ? "服务返回的重置时间已过，新窗口尚待确认。" : "重置：" + reset.formatted(.dateTime.month().day().hour().minute()))
+                }
             }
             sections.append(lines.joined(separator:"\n"))
         }

@@ -3,6 +3,30 @@ import XCTest
 @testable import UsageCore
 
 final class QuotaAmountsTests: XCTestCase {
+    func testFreshCopilotReadWithPastResetKeepsUsageFreshButResetUnconfirmed() throws {
+        let now = Date(timeIntervalSince1970:10_000)
+        let q = QuotaWindow(id:"copilot-rpc:premium",tool:.copilot,title:"Credits",usedPercent:7.5,
+                            resetsAt:now.addingTimeInterval(-0.2),capturedAt:now,source:"test")
+        XCTAssertTrue(q.hasUnconfirmedReset)
+        XCTAssertNil(q.confirmedResetsAt, "An invalid next-reset hint must not generate a new notification window on every refresh")
+        XCTAssertFalse(q.isStale(at:now.addingTimeInterval(60)))
+        XCTAssertTrue(q.isStale(at:now.addingTimeInterval(901)), "Old readings must still age out")
+    }
+
+    func testRealResetAfterCaptureStillExpiresAndOtherProvidersKeepTheirPolicy() {
+        let now = Date(timeIntervalSince1970:10_000)
+        let scheduled = QuotaWindow(id:"copilot-rpc:premium",tool:.copilot,title:"Credits",usedPercent:7.5,
+                                    resetsAt:now.addingTimeInterval(300),capturedAt:now,source:"test")
+        XCTAssertFalse(scheduled.hasUnconfirmedReset)
+        XCTAssertNotNil(scheduled.confirmedResetsAt)
+        XCTAssertFalse(scheduled.isStale(at:now.addingTimeInterval(299)))
+        XCTAssertTrue(scheduled.isStale(at:now.addingTimeInterval(300)))
+        let codex = QuotaWindow(id:"rpc:primary",tool:.codex,title:"5h",usedPercent:10,
+                               resetsAt:now.addingTimeInterval(-1),capturedAt:now,source:"test")
+        XCTAssertFalse(codex.hasUnconfirmedReset)
+        XCTAssertTrue(codex.isStale(at:now))
+    }
+
     func testCopilotCreditsUseReportedCountersWithoutInventingScale() throws {
         let result: [String: Any] = ["quotaSnapshots": ["premium_interactions": ["entitlementRequests": 10_000_000, "usedRequests": 50_000, "remainingPercentage": 99.5, "tokenBasedBilling": true]]]
         let quota = try XCTUnwrap(CopilotQuotaClient.parse(result).first)

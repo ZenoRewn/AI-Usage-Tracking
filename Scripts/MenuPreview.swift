@@ -8,6 +8,8 @@ import SwiftUI
 @MainActor final class PreviewDelegate: NSObject, NSApplicationDelegate {
     let model = AppModel(dataDirectory:FileManager.default.temporaryDirectory.appendingPathComponent("usage-preview-" + UUID().uuidString),collectsUsage:false)
     var preview: NSWindow?
+    var menuPanel: NSPanel?
+    var statusItem: NSStatusItem?
     lazy var workbench = WorkbenchController(makeWindow:{ [self] in
         let window = NSWindow(contentRect:NSRect(x:0,y:0,width:1280,height:850),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
         window.title = "Usage Tracking · 示例工作台"
@@ -28,6 +30,11 @@ import SwiftUI
         ]
         model.quotaErrors = [:]
         switch scenario {
+        case "重置待确认":
+            model.snapshot.quotas.removeAll { $0.tool != .copilot }
+            model.snapshot.quotas[0].usedPercent = 7.5
+            model.snapshot.quotas[0].amounts = .init(unit:.credits,total:1000,used:75)
+            model.snapshot.quotas[0].resetsAt = now.addingTimeInterval(-0.2)
         case "无额度": model.snapshot.quotas = []
         case "未就绪":
             model.snapshot.quotas.removeAll { $0.tool != .copilot }
@@ -49,6 +56,11 @@ import SwiftUI
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
+        let item = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
+        item.button?.image = NSImage(systemSymbolName:"circle.dashed.inset.filled",accessibilityDescription:"Usage Tracking 示例面板")
+        item.button?.target = self
+        item.button?.action = #selector(toggleMenuPanel)
+        statusItem = item
         let now = Date()
         let start = Calendar.current.startOfDay(for:now)
         model.config.sources = []
@@ -71,6 +83,31 @@ import SwiftUI
         preview = window
         NSApp.activate(ignoringOtherApps:true)
     }
+
+    @objc func toggleMenuPanel() {
+        if let menuPanel, menuPanel.isVisible { menuPanel.orderOut(nil); return }
+        if menuPanel == nil {
+            let panel = PreviewMenuPanel(contentRect:NSRect(x:0,y:0,width:464,height:520),styleMask:[.nonactivatingPanel],backing:.buffered,defer:false)
+            panel.isReleasedWhenClosed = false
+            panel.level = .popUpMenu
+            panel.contentViewController = NSHostingController(rootView:
+                MenuPopover(model:model,showWorkbench:{ [self] page in
+                    panel.orderOut(nil); model.selectedPage = page; workbench.show()
+                }).onExitCommand { panel.orderOut(nil) })
+            menuPanel = panel
+        }
+        guard let panel = menuPanel, let button = statusItem?.button, let host = button.window else { return }
+        panel.setContentSize(panel.contentView!.fittingSize)
+        let anchor = host.convertToScreen(button.convert(button.bounds,to:nil))
+        let screen = host.screen?.visibleFrame ?? NSRect(x:0,y:0,width:1440,height:900)
+        panel.setFrameOrigin(NSPoint(x:min(max(screen.minX+8,anchor.midX-panel.frame.width/2),screen.maxX-panel.frame.width-8),
+                                     y:max(screen.minY+8,anchor.minY-panel.frame.height-6)))
+        panel.makeKeyAndOrderFront(nil)
+    }
+}
+
+final class PreviewMenuPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
 }
 
 struct PreviewView: View {
@@ -81,9 +118,10 @@ struct PreviewView: View {
         VStack(spacing:0) {
             HStack {
                 Text("虚构数据").font(.caption)
-                Picker("状态",selection:$scenario) { ForEach(["正常","无额度","未就绪","旧快照","异常"],id:\.self) { Text($0) } }.frame(width:170)
+                Picker("状态",selection:$scenario) { ForEach(["正常","重置待确认","无额度","未就绪","旧快照","异常"],id:\.self) { Text($0) } }.frame(width:150)
                     .onChange(of:scenario) { owner.sample(scenario) }
                 Toggle("深色",isOn:$dark)
+                Button("状态栏面板") { owner.toggleMenuPanel() }
             }.padding(12)
             Divider()
             MenuPopover(model:owner.model,showWorkbench:{ page in owner.model.selectedPage = page; owner.workbench.show() })

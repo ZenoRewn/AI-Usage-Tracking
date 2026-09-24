@@ -72,6 +72,17 @@ final class MenuQuotaSummaryTests: XCTestCase {
         }
     }
 
+    func testFreshLowCopilotUsageStaysGreenWhenOnlyResetHintIsInvalid() {
+        let q = quota("copilot-rpc:premium",tool:.copilot,percent:7.5,reset:now.addingTimeInterval(-0.2))
+        let summary = MenuQuotaSummary(tool:.copilot,quotas:[q],now:now.addingTimeInterval(60))
+        XCTAssertEqual(summary.pressure,.normal)
+        XCTAssertEqual(summary.ringFraction,0.075)
+        XCTAssertEqual(summary.statusText(loading:false,error:nil),"已用")
+        XCTAssertEqual(summary.resetText,"重置时间待确认")
+        XCTAssertTrue(summary.details.contains("重置时间待确认"))
+        XCTAssertEqual(MenuQuotaSummary(tool:.copilot,quotas:[q],now:now.addingTimeInterval(901)).pressure,.stale)
+    }
+
     func testResetCountdownBoundariesAndMissingTime() {
         for (seconds, expected) in [(30.0,"不到 1 分钟后重置"),(60,"1m 后重置"),(3060,"51m 后重置"),(8280,"2h 18m 后重置"),(86399,"1 天后重置"),(86400,"1 天后重置"),(93600,"1 天 2h 后重置")] {
             let summary = MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:20,reset:now.addingTimeInterval(seconds))],now:now)
