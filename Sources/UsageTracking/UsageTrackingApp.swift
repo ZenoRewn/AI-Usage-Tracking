@@ -16,7 +16,7 @@ import UsageCore
             CommandGroup(replacing: .newItem) { Button("打开工作台") { appDelegate.showWorkbench() }.keyboardShortcut("0") }
             CommandGroup(after: .newItem) {
                 Button("刷新用量与额度") { model.refreshAll() }.keyboardShortcut("r")
-                Button("导出 JSON…") { model.export(json: true) }.keyboardShortcut("e", modifiers: [.command,.shift])
+                Button("导出 JSON…") { model.export(json: true) }.keyboardShortcut("e", modifiers: [.command,.shift]).disabled(!model.selectedPage.isUsageAnalysis)
             }
         }
     }

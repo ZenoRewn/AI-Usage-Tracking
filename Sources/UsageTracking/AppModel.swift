@@ -266,6 +266,7 @@ struct DailyUsage: Identifiable {
 enum AppPage: String, CaseIterable, Identifiable {
     case overview = "总览", projects = "项目", sessions = "会话", clients = "客户端与模型", quotas = "账户额度", costs = "成本", sources = "数据源", prices = "模型价格", settings = "设置"
     var id: String { rawValue }
+    var isUsageAnalysis: Bool { [.overview,.projects,.sessions,.clients,.costs].contains(self) }
     var symbol: String { switch self { case .overview: "square.grid.2x2"; case .projects: "folder"; case .sessions: "bubble.left.and.bubble.right"; case .clients: "desktopcomputer"; case .quotas: "gauge.with.dots.needle.67percent"; case .costs: "dollarsign.circle"; case .sources: "externaldrive.connected.to.line.below"; case .prices: "tag"; case .settings: "slider.horizontal.3" } }
     var subtitle: String { switch self { case .overview: "看清每个工具与项目的投入"; case .projects: "跨工具聚合，保留可核对的项目归属"; case .sessions: "从会话深入到模型与用量记录"; case .clients: "比较每个客户端调用的模型与用量"; case .quotas: "账户窗口独立显示，不与 Token 消耗混算"; case .costs: "按明确价格估算，实际账单单独核对"; case .sources: "查看入口覆盖、采集状态和数据精度"; case .prices: "统一公价与自定义覆盖，在此集中管理"; case .settings: "本机数据、连接、通知与个性设置" } }
 }

@@ -45,6 +45,7 @@ import SwiftUI
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
                               backing: .buffered, defer: false)
         window.title = "Usage Tracking"
+        window.toolbarStyle = .unifiedCompact
         window.identifier = NSUserInterfaceItemIdentifier("main")
         window.tabbingMode = .disallowed
         window.contentViewController = NSHostingController(rootView:

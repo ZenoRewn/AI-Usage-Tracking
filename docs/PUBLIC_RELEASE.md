@@ -1,19 +1,21 @@
-# Usage Tracking v0.5.0（Build 10）
+# Usage Tracking v0.5.1（Build 11）
 
 Author: Zeno Ren
 
 这次更新让菜单栏中的额度更易读、详情更易查看。继续支持 Codex、Claude Code、GitHub Copilot 的本机用量、账户额度、项目与参考成本。
 
-- 三张额度卡片采用 44pt 圆环和居中品牌，直接显示额度压力、窗口、重置倒计时及旧快照/失败状态；Copilot 保留已用 / 总 Credits。
+- 三张额度卡片将 36pt 品牌圆环与比例并排，高度约从 210pt 收到 130pt，减少无数据时的重复提示；保留重置倒计时、旧快照/失败状态及 Copilot Credits。
 - 点击额度卡片展开各窗口、完整计数、来源和时间；支持独立刷新与 Esc 关闭。
 - 今天 / 7 / 30 天用量使用明确的 Token / 参考 USD 分段切换；点击数字查看明细，点击今日 Top 3 项目查看该项目今天的记录。
 - 保持未知用量、未定价和真实零值的区别；修复倒计时跨天舍入及异常重置时间导致的崩溃。
+- 工作台侧栏分为概览、用量分析和管理；仅用量分析页显示用量导出入口。无记录工具显示“—”，部分定价金额明确标识。
+- 修复 macOS 26 工作台标题和操作按钮被工具栏遮挡的问题。
 - 启动默认只在菜单栏运行；打开工作台时显示 Dock 图标，关闭窗口后继续采集。
 - 个人数据保存在本机，导出默认脱敏；MIT 许可证。
 
 ## 下载
 
-推荐下载 `Usage-Tracking-0.5.0-arm64.dmg`，打开后将 App 拖入 Applications。也可使用 ZIP。仅支持 Apple Silicon（M 系列，arm64）和 macOS 14+，无需 Rosetta，不提供 Intel 或 Universal 版本；无需安装 Xcode、Python、Node 或 Docker。
+推荐下载 `Usage-Tracking-0.5.1-arm64.dmg`，打开后将 App 拖入 Applications。也可使用 ZIP。仅支持 Apple Silicon（M 系列，arm64）和 macOS 14+，无需 Rosetta，不提供 Intel 或 Universal 版本；无需安装 Xcode、Python、Node 或 Docker。
 
 升级前退出旧版，替换 App 即可；本机历史数据和配置继续保留。
 

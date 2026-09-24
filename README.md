@@ -4,11 +4,11 @@ Author: Zeno Ren
 
 原生 macOS AI 编程工具用量监控：菜单栏查看额度，主窗口分析项目、会话、模型和 Token。个人单机使用，数据保存在本机。
 
-当前版本：**0.5.0 预览版（Build 10）**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
+当前版本：**0.5.1 预览版（Build 11）**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
 
 ## 下载与安装
 
-**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.0/Usage-Tracking-0.5.0-arm64.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.0/Usage-Tracking-0.5.0-arm64.zip)
+**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.1/Usage-Tracking-0.5.1-arm64.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.1/Usage-Tracking-0.5.1-arm64.zip)
 
 macOS 14+，**仅支持 Apple Silicon（M 系列，arm64）**，无需 Rosetta，不提供 Intel 版本。打开 DMG，把 App 拖到“应用程序”即可安装；启动后默认在**顶部菜单栏**显示图标，点击“打开工作台”查看主界面。运行 App 不需要开发环境。
 
@@ -32,7 +32,7 @@ open "build/Usage Tracking.app"
 
 - 原生 SwiftUI/AppKit 主窗口、单图标菜单栏、紧凑订阅摘要、深浅色外观与作者标识；启动仅在菜单栏运行，打开主窗口才显示 Dock 图标。
 - “本机用量”对比 Codex、Claude、Copilot 的今天 / 7 / 30 天用量，与今日 Top 3 项目共享明确的 Token / 参考 USD 分段切换；点击数字打开可停留阅读的明细。
-- 三张订阅额度卡片使用 44pt 圆环与居中品牌、已用比例、额度压力文字、窗口及重置倒计时；Copilot 保留已用 / 总 Credits。点击卡片打开独立窗口、完整计数、来源与时间；Codex/Copilot 可独立手动刷新。
+- 三张紧凑订阅额度卡片将 36pt 品牌圆环与已用比例并排，保留额度状态及重置倒计时；Copilot 保留已用 / 总 Credits。点击卡片打开独立窗口、完整计数、来源与时间；Codex/Copilot 可独立手动刷新。
 - 今日 Top 3 按今天已观测 Token 排名，显示项目名、参与工具和总量。点击项目打开今天该精确路径的记录，并清除工作台原有工具和搜索筛选；同名不同路径不混淆。
 - 产品标识：Codex 黑白终端标志、Claude 橙色星形标志、GitHub Copilot 紫色机器人标志；通用界面继续使用紫蓝主题。
 - 今日/7天/30天/全部用量；工具和文本筛选；趋势图。
@@ -107,7 +107,7 @@ Copilot 在 `tokenBasedBilling` 开启时按照本机 VS Code 的展示口径，
 
 额度环在低于 80% 时为常规色，80–89% 为提醒色，90% 及以上为警示色，同时显示状态文字；通知阈值仍为原有的 90%。旧快照弱化圆环并标识，缺少额度不显示为 0%。倒计时只用于新鲜且重置时间有效的快照；重置时刻已过显示“等待新窗口”，不会自动清零。完整窗口名、服务重置时间与采集时间可在点击详情中核对。
 
-开发者可运行 `zsh Scripts/build-menu-preview.sh`，再打开 `build/Usage Menu Preview.app`，在独立窗口检查深浅色、正常/缺失/旧快照/异常状态。它使用虚构数据、独立临时目录，禁用采集器与账户查询；验收范围为展示与导航，不执行连接安装或系统设置。它用于原生视图验收，不代表真实账户服务已验收。
+开发者可运行 `zsh Scripts/build-menu-preview.sh`，再打开 `build/Usage Menu Preview.app`，在独立窗口检查深浅色、正常/缺失/未就绪/旧快照/异常状态。它使用虚构数据、独立临时目录，禁用采集器与账户查询；验收范围为展示与导航，不执行连接安装或系统设置。它用于原生视图验收，不代表真实账户服务已验收。
 
 ## 数据与隐私
 
@@ -134,6 +134,7 @@ swift run -c release usage-tracking export /tmp/usage-report.json
 
 ## 文档
 
+- [v0.5.1 紧凑额度与工作台信息层级](docs/RELEASE_0.5.1.md)
 - [v0.5.0 菜单面板与交互优化](docs/RELEASE_0.5.0.md)
 - [v0.4.5 Apple Silicon 公开发行版](docs/RELEASE_0.4.5.md)
 - [v0.4.4 用量概览整合与成本切换](docs/RELEASE_0.4.4.md)

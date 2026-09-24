@@ -11,7 +11,8 @@ import SwiftUI
     lazy var workbench = WorkbenchController(makeWindow:{ [self] in
         let window = NSWindow(contentRect:NSRect(x:0,y:0,width:1280,height:850),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
         window.title = "Usage Tracking · 示例工作台"
-        window.contentViewController = NSHostingController(rootView:ContentView(model:model))
+        window.toolbarStyle = .unifiedCompact
+        window.contentViewController = NSHostingController(rootView:ContentView(model:model).frame(minWidth:1050,minHeight:700))
         window.center()
         return window
     })
@@ -28,6 +29,11 @@ import SwiftUI
         model.quotaErrors = [:]
         switch scenario {
         case "无额度": model.snapshot.quotas = []
+        case "未就绪":
+            model.snapshot.quotas.removeAll { $0.tool != .copilot }
+            model.snapshot.quotas[0].capturedAt = now.addingTimeInterval(-1320)
+            model.snapshot.quotas[0].resetsAt = now.addingTimeInterval(-60)
+            model.quotaErrors[.codex] = "示例：暂时未能查询额度。"
         case "旧快照":
             for i in model.snapshot.quotas.indices { model.snapshot.quotas[i].capturedAt = now.addingTimeInterval(-1320) }
         case "异常":
@@ -56,10 +62,11 @@ import SwiftUI
         model.todayProjects = TodayProjects.summarize(model.snapshot.events,catalog:model.config.prices,now:now)
         sample("正常")
         let window = NSWindow(contentRect:NSRect(x:0,y:0,width:464,height:680),styleMask:[.titled,.closable],backing:.buffered,defer:false)
-        window.title = "Usage Tracking 0.5.0 (10) · 示例验收"
+        window.title = "Usage Tracking \(UsageCoreVersion.current) · 示例验收"
         window.isReleasedWhenClosed = false
         window.contentViewController = NSHostingController(rootView:PreviewView(owner:self))
         window.setContentSize(window.contentView!.fittingSize)
+        print("Sample menu window content: \(window.contentView!.fittingSize)")
         window.center(); window.makeKeyAndOrderFront(nil)
         preview = window
         NSApp.activate(ignoringOtherApps:true)
@@ -74,7 +81,7 @@ struct PreviewView: View {
         VStack(spacing:0) {
             HStack {
                 Text("虚构数据").font(.caption)
-                Picker("状态",selection:$scenario) { ForEach(["正常","无额度","旧快照","异常"],id:\.self) { Text($0) } }.frame(width:170)
+                Picker("状态",selection:$scenario) { ForEach(["正常","无额度","未就绪","旧快照","异常"],id:\.self) { Text($0) } }.frame(width:170)
                     .onChange(of:scenario) { owner.sample(scenario) }
                 Toggle("深色",isOn:$dark)
             }.padding(12)

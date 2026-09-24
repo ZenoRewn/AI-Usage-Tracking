@@ -7,14 +7,28 @@ struct ContentView: View {
     @Bindable var model: AppModel
     var body: some View {
         NavigationSplitView {
-            VStack(alignment:.leading,spacing:24) {
+            VStack(alignment:.leading,spacing:14) {
                 HStack(spacing:10) {
                     Image(systemName:"chart.bar.xaxis").font(.system(size:23,weight:.semibold)).foregroundStyle(.white).frame(width:43,height:43).background(Display.accent.gradient,in:RoundedRectangle(cornerRadius:12))
                     VStack(alignment:.leading,spacing:2) { Text("Usage").font(.system(size:21,weight:.bold)); Text("Tracking").font(.system(size:15,weight:.medium)).foregroundStyle(.secondary) }
                 }.padding(.top,20).padding(.horizontal,20)
                 Text("本机用量工作台").font(.caption).foregroundStyle(.secondary).padding(.horizontal,22)
-                List(AppPage.allCases, selection: $model.selectedPage) { page in
-                    Label(page.rawValue,systemImage:page.symbol).font(.system(size:14)).padding(.vertical,6).tag(page)
+                List(selection:$model.selectedPage) {
+                    Section("概览") {
+                        sidebarLink(.overview)
+                        sidebarLink(.quotas)
+                    }
+                    Section("用量分析") {
+                        sidebarLink(.projects)
+                        sidebarLink(.sessions)
+                        sidebarLink(.clients)
+                        sidebarLink(.costs)
+                    }
+                    Section("管理") {
+                        sidebarLink(.sources)
+                        sidebarLink(.prices)
+                        sidebarLink(.settings)
+                    }
                 }.listStyle(.sidebar)
                 VStack(alignment:.leading,spacing:8) {
                     Label(model.paused ? "采集已暂停" : "数据保存在本机",systemImage:model.paused ? "pause.circle" : "lock.shield").font(.caption).foregroundStyle(Display.accent)
@@ -24,7 +38,7 @@ struct ContentView: View {
             }.navigationSplitViewColumnWidth(min:190,ideal:215,max:250)
         } detail: {
             VStack(spacing:0) {
-                header
+                header.padding(.top,toolbarClearance)
                 if let message = model.statusMessage { HStack { Image(systemName:"checkmark.circle").foregroundStyle(Display.accent); Text(message); Spacer() }.font(.caption).foregroundStyle(.secondary).padding(.horizontal,28).padding(.bottom,12) }
                 if model.isScanning { HStack { ProgressView().controlSize(.small); Text(model.scanProgress).font(.caption); Spacer() }.padding(.horizontal,28).padding(.bottom,12) }
                 Divider()
@@ -52,15 +66,25 @@ struct ContentView: View {
         }
         .alert("Usage Tracking",isPresented:Binding(get:{ model.error != nil },set:{ if !$0 { model.error = nil } })) { Button("知道了") { model.error = nil } } message: { Text(model.error ?? "") }
     }
+    private func sidebarLink(_ page: AppPage) -> some View {
+        Label(page.rawValue,systemImage:page.symbol).font(.system(size:13)).padding(.vertical,4).tag(page)
+    }
+    // AppKit-hosted split views on macOS 26 extend beneath the compact window toolbar.
+    private var toolbarClearance: CGFloat {
+        if #available(macOS 26.0, *) { return 24 }
+        return 0
+    }
     private var header: some View {
         VStack(alignment:.leading,spacing:17) {
             HStack(alignment:.top) {
-                VStack(alignment:.leading,spacing:6) { Text(model.selectedPage.rawValue).font(.system(size:29,weight:.bold)); Text(model.selectedPage.subtitle).font(.subheadline).foregroundStyle(.secondary) }
+                VStack(alignment:.leading,spacing:6) { Text(model.selectedPage.rawValue).font(.system(size:25,weight:.bold)); Text(model.selectedPage.subtitle).font(.subheadline).foregroundStyle(.secondary) }
                 Spacer()
-                Menu { Button("导出 CSV") { model.export(json:false) }; Button("导出 JSON") { model.export(json:true) } } label: { Label("导出",systemImage:"square.and.arrow.up") }
+                if model.selectedPage.isUsageAnalysis {
+                    Menu { Button("导出 CSV") { model.export(json:false) }; Button("导出 JSON") { model.export(json:true) } } label: { Label("导出",systemImage:"square.and.arrow.up") }
+                }
                 Button { model.refreshAll() } label: { Image(systemName:"arrow.clockwise").frame(width:20) }.disabled(model.isScanning && model.quotaLoading).help("刷新本地用量与账户额度 ⌘R")
             }
-            if [.overview,.projects,.sessions,.clients,.costs].contains(model.selectedPage) {
+            if model.selectedPage.isUsageAnalysis {
                 HStack(spacing:12) {
                     Picker("时间范围",selection:$model.rangeDays) { Text("今天").tag(1); Text("7 天").tag(7); Text("30 天").tag(30); Text("全部").tag(0) }.pickerStyle(.segmented).frame(width:265)
                     Picker("工具",selection:$model.selectedTool) { Text("全部工具").tag("all"); ForEach(Tool.allCases) { Text($0.title).tag($0.rawValue) } }.labelsHidden().frame(width:165).onChange(of:model.selectedTool) { model.selectedClient = "all" }
@@ -106,11 +130,11 @@ struct OverviewView: View {
         let total = events.reduce(0) { $0 + $1.tokens.total }
         let projects = model.projects
         HStack(spacing:14) {
-            MetricCard(title:"已观测 Token",value:Display.tokens(total),note:"输入含缓存 · 输出含推理子集",symbol:"chart.bar")
+            MetricCard(title:"已观测 Token",value:events.isEmpty ? "—" : Display.tokens(total),note:events.isEmpty ? "所选范围未观察到记录" : "输入含缓存 · 输出含推理子集",symbol:"chart.bar")
             MetricCard(title:"项目",value:String(projects.filter { !$0.id.isEmpty }.count),note:"跨工具归属 · worktree 自动合并",symbol:"folder")
             MetricCard(title:"会话",value:String(model.sessions.count),note:"所选范围内有用量的会话",symbol:"bubble.left.and.bubble.right")
             let priced = model.costCoverage
-            MetricCard(title:"参考成本",value:priced.1 == 0 ? "待定价" : priced.0.formatted(.currency(code:"USD")),note:total == 0 ? "按已配置价格计算" : "已定价覆盖 \(Int(Double(priced.1)/Double(max(1,total))*100))% · 非账单",symbol:"dollarsign.circle")
+            MetricCard(title:priced.1 > 0 && priced.1 < total ? "参考成本 · 部分定价" : "参考成本",value:events.isEmpty ? "—" : priced.1 == 0 ? "待定价" : "≈" + priced.0.formatted(.currency(code:"USD")),note:total == 0 ? "按已配置价格计算" : "已定价覆盖 \(Int(Double(priced.1)/Double(max(1,total))*100))% · 非账单",symbol:"dollarsign.circle")
         }
         HStack(alignment:.top,spacing:14) {
             SurfaceCard(title:"用量趋势",subtitle:"按本地时区归账") {
@@ -126,7 +150,7 @@ struct OverviewView: View {
                 ForEach(Tool.allCases) { tool in
                     let rows = events.filter { $0.tool == tool }; let count = rows.reduce(Int64(0)) { $0 + $1.tokens.total }
                     VStack(alignment:.leading,spacing:9) {
-                        HStack { BrandLogo(tool:tool,size:17); Text(tool.title).font(.subheadline); Spacer(); Text(Display.tokens(count)).font(.system(.subheadline,design:.rounded).weight(.semibold)) }
+                        HStack { BrandLogo(tool:tool,size:17); Text(tool.title).font(.subheadline); Spacer(); Text(rows.isEmpty ? "—" : Display.tokens(count)).font(.system(.subheadline,design:.rounded).weight(.semibold)) }
                         GeometryReader { geometry in Capsule().fill(Display.color(tool).opacity(0.10)).overlay(alignment:.leading) { Capsule().fill(Display.color(tool)).frame(width:geometry.size.width * (total == 0 ? 0 : Double(count)/Double(total))) } }.frame(height:5)
                         Text(rows.isEmpty ? "所选范围暂无用量" : "\(Set(rows.map(\.session)).count) 个会话 · \(rows.count.formatted()) 条记录").font(.system(size:10)).foregroundStyle(.secondary)
                     }.padding(.bottom,8)

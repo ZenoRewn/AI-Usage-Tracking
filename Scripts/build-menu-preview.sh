@@ -23,8 +23,8 @@ cat > "$preview_app/Contents/Info.plist" <<'PLIST'
 <key>CFBundleName</key><string>Usage Menu Preview</string>
 <key>CFBundleExecutable</key><string>UsageMenuPreview</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>0.5.0</string>
-<key>CFBundleVersion</key><string>10</string>
+<key>CFBundleShortVersionString</key><string>0.5.1</string>
+<key>CFBundleVersion</key><string>11</string>
 </dict></plist>
 PLIST
 codesign --force --sign - "$preview_app"

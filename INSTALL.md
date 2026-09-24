@@ -11,14 +11,14 @@ Author: Zeno Ren
 
 ## 首次打开
 
-v0.5.0 使用本地 ad-hoc 签名，**尚未经过 Apple Developer ID 签名和公证**。首次下载打开时，macOS 可能提示无法验证开发者。
+v0.5.1 使用本地 ad-hoc 签名，**尚未经过 Apple Developer ID 签名和公证**。首次下载打开时，macOS 可能提示无法验证开发者。
 
 确认下载来自本仓库的 Release 后，可在尝试打开 App 后进入“系统设置 → 隐私与安全性”，使用该 App 对应的“仍要打开”。按系统提示完成确认。无需关闭系统的 Gatekeeper 或修改全局安全设置。
 
 Release 附带 SHA-256 校验文件。把校验文件与 DMG、ZIP 放在同一目录后，可运行：
 
 ```sh
-shasum -a 256 -c Usage-Tracking-0.5.0-arm64-SHA256SUMS.txt
+shasum -a 256 -c Usage-Tracking-0.5.1-arm64-SHA256SUMS.txt
 ```
 
 ## 数据连接
