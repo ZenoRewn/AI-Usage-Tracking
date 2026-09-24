@@ -11,9 +11,9 @@ struct MenuTopProjects: View {
     var body: some View {
         VStack(alignment:.leading,spacing:6) {
             HStack {
-                Text("今日 Top 3 项目").font(.system(size:11,weight:.medium)).foregroundStyle(.secondary)
+                Text("今日 Top 3 项目").font(.system(size:11,weight:.medium)).foregroundStyle(MenuPalette.muted)
                 Spacer()
-                Text("按 Token 排名").font(.system(size:11)).foregroundStyle(.secondary)
+                Text("按 Token 排名").font(.system(size:11)).foregroundStyle(MenuPalette.muted)
             }
             if !isToday {
                 Text("正在更新今天的统计…").font(.caption).foregroundStyle(.secondary)
@@ -35,12 +35,12 @@ struct MenuTopProjects: View {
         return Button { openProject(project.project) } label: {
           HStack(spacing:7) {
             Text(String(rank)).font(.system(size:11,weight:.medium,design:.rounded))
-                .foregroundStyle(Display.purple).frame(width:10,alignment:.leading)
+                .foregroundStyle(MenuPalette.muted).frame(width:10,alignment:.leading)
             Text(projectName(project.project)).font(.system(size:11,weight:.medium)).lineLimit(1).truncationMode(.middle)
             Spacer(minLength:0)
             HStack(spacing:4) {
                 ForEach(project.tools) { tool in
-                    BrandLogo(tool:tool.tool,size:11)
+                    BrandLogo(tool:tool.tool,size:11,tint:MenuPalette.muted)
                         .accessibilityLabel("\(tool.tool.title) · \(tool.tokens.formatted()) Tokens")
                 }
             }

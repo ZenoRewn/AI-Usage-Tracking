@@ -15,20 +15,27 @@ struct MenuUsageOverview: View {
             HStack {
                 Text("本机用量").font(.caption.weight(.semibold))
                 Spacer()
-                Picker("用量单位",selection:$metric) {
-                    Text("Token").tag(MenuUsageMetric.tokens)
-                    Text("参考 USD").tag(MenuUsageMetric.cost)
-                }.pickerStyle(.segmented).labelsHidden().frame(width:174)
+                HStack(spacing:2) {
+                    metricButton(.tokens)
+                    metricButton(.cost)
+                }.padding(2).background(MenuPalette.track,in:RoundedRectangle(cornerRadius:8))
+                    .accessibilityElement(children:.contain).accessibilityLabel("用量单位")
             }
             toolUsage
             if metric == .cost {
-                Text("≈ 公价估算 · * 部分定价 · 非订阅账单").font(.system(size:11)).foregroundStyle(.secondary)
+                Text("≈ 公价估算 · * 部分定价 · 非订阅账单").font(.system(size:11)).foregroundStyle(MenuPalette.muted)
             }
-            Divider().opacity(0.6)
+            Divider().overlay(MenuPalette.line)
             MenuTopProjects(summary:projects,projectName:projectName,metric:metric,openProject:openProject)
-        }.padding(10)
-        .background(.primary.opacity(0.025),in:RoundedRectangle(cornerRadius:10))
-        .overlay(RoundedRectangle(cornerRadius:10).strokeBorder(.primary.opacity(0.055)))
+        }.padding(.vertical,5)
+    }
+    private func metricButton(_ value: MenuUsageMetric) -> some View {
+        Button { metric = value } label: {
+            Text(value.title).font(.system(size:11,weight:.medium)).padding(.horizontal,10).padding(.vertical,4)
+                .foregroundStyle(metric == value ? MenuPalette.text : MenuPalette.muted)
+                .background(metric == value ? MenuPalette.card : .clear,in:RoundedRectangle(cornerRadius:6))
+                .contentShape(Rectangle())
+        }.buttonStyle(.plain).accessibilityValue(metric == value ? "已选" : "未选")
     }
     private var toolUsage: some View {
         Grid(alignment:.leading,horizontalSpacing:10,verticalSpacing:7) {
@@ -37,11 +44,11 @@ struct MenuUsageOverview: View {
                 ForEach([1,7,30],id:\.self) { day in
                     Text(day == 1 ? "今天" : "\(day) 天").frame(width:74,alignment:.trailing)
                 }
-            }.font(.system(size:11)).foregroundStyle(.secondary)
+            }.font(.system(size:11)).foregroundStyle(MenuPalette.muted)
             ForEach(usage) { row in
                 GridRow {
                     HStack(spacing:5) {
-                        BrandLogo(tool:row.tool,size:12)
+                        BrandLogo(tool:row.tool,size:12,tint:MenuPalette.muted)
                         Text(Display.shortName(row.tool)).font(.system(size:11,weight:.medium))
                     }.frame(maxWidth:.infinity,alignment:.leading)
                     ForEach(row.periods) { period in

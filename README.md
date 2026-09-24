@@ -4,11 +4,11 @@ Author: Zeno Ren
 
 原生 macOS AI 编程工具用量监控：菜单栏查看额度，主窗口分析项目、会话、模型和 Token。个人单机使用，数据保存在本机。
 
-当前版本：**0.5.1 预览版（Build 11）**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
+当前版本：**0.5.2 预览版（Build 12）**。独立 Swift 实现，无需 Python、Node、Docker 或云服务来运行 App。
 
 ## 下载与安装
 
-**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.1/Usage-Tracking-0.5.1-arm64.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.1/Usage-Tracking-0.5.1-arm64.zip)
+**[下载最新 Release](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/latest)** · [DMG 安装包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.2/Usage-Tracking-0.5.2-arm64.dmg) · [ZIP 压缩包](https://github.com/ZenoRewn/AI-Usage-Tracking/releases/download/v0.5.2/Usage-Tracking-0.5.2-arm64.zip)
 
 macOS 14+，**仅支持 Apple Silicon（M 系列，arm64）**，无需 Rosetta，不提供 Intel 版本。打开 DMG，把 App 拖到“应用程序”即可安装；启动后默认在**顶部菜单栏**显示图标，点击“打开工作台”查看主界面。运行 App 不需要开发环境。
 
@@ -32,7 +32,7 @@ open "build/Usage Tracking.app"
 
 - 原生 SwiftUI/AppKit 主窗口、单图标菜单栏、紧凑订阅摘要、深浅色外观与作者标识；启动仅在菜单栏运行，打开主窗口才显示 Dock 图标。
 - “本机用量”对比 Codex、Claude、Copilot 的今天 / 7 / 30 天用量，与今日 Top 3 项目共享明确的 Token / 参考 USD 分段切换；点击数字打开可停留阅读的明细。
-- 三张紧凑订阅额度卡片将 36pt 品牌圆环与已用比例并排，保留额度状态及重置倒计时；Copilot 保留已用 / 总 Credits。点击卡片打开独立窗口、完整计数、来源与时间；Codex/Copilot 可独立手动刷新。
+- 三张约 100pt 高的额度卡片将 30pt 单色品牌圆环与已用比例并排，保留额度状态及重置倒计时；Copilot 完整 Credits 计数在悬停或点击详情中查看。点击卡片打开独立窗口、完整计数、来源与时间；Codex/Copilot 可独立手动刷新。
 - 今日 Top 3 按今天已观测 Token 排名，显示项目名、参与工具和总量。点击项目打开今天该精确路径的记录，并清除工作台原有工具和搜索筛选；同名不同路径不混淆。
 - 产品标识：Codex 黑白终端标志、Claude 橙色星形标志、GitHub Copilot 紫色机器人标志；通用界面继续使用紫蓝主题。
 - 今日/7天/30天/全部用量；工具和文本筛选；趋势图。
@@ -99,7 +99,7 @@ Claude 额度随 statusLine 实际更新，本地读取周期不能让 Claude �
 
 Copilot 在 `tokenBasedBilling` 开启时按照本机 VS Code 的展示口径，将账户返回的额度计数显示为 Credits，不从 Token/参考 USD 换算，不猜测缩放系数。缺失绝对计数显示“—”。[字段依据与边界](docs/QUOTA_SEMANTICS.md)。
 
-菜单面板中的 Copilot / Codex 刷新箭头只查询对应账户，可在暂停自动刷新时使用；正在查询时防止重复点击。多个额度窗口采用有效窗口中最高的已用比例，无有效窗口时保留最高旧快照，不把窗口百分比相加。Credits 的 K / M / B 分别为千 / 百万 / 十亿，悬停可看完整数字。时钟提示代表存在待更新快照；刷新后若服务仍返回已过期的重置时间，提示会保留并说明原因。
+菜单面板中的 Copilot / Codex 刷新箭头只查询对应账户，可在暂停自动刷新时使用；正在查询时防止重复点击。多个额度窗口采用有效窗口中最高的已用比例，无有效窗口时保留最高旧快照，不把窗口百分比相加。Credits 的 K / M / B 分别为千 / 百万 / 十亿，悬停可看完整数字。“旧快照 / 含旧窗口”提示代表存在待更新快照；刷新后若服务仍返回已过期的重置时间，提示会保留并说明原因。
 
 今日 Top 3 从本地时区零点统计到当前时间，独立于主窗口筛选，沿用已归一化的项目路径和自定义名称。同名不同路径不合并；未归属项目的用量单独注明，不占榜单名额；不足三个项目显示实际数量。跨日打开面板时重新计算当天统计。包含会话汇总的项目以“≈”提醒日期归属近似。
 
@@ -134,6 +134,7 @@ swift run -c release usage-tracking export /tmp/usage-report.json
 
 ## 文档
 
+- [v0.5.2 菜单配色与进一步紧凑化](docs/RELEASE_0.5.2.md)
 - [v0.5.1 紧凑额度与工作台信息层级](docs/RELEASE_0.5.1.md)
 - [v0.5.0 菜单面板与交互优化](docs/RELEASE_0.5.0.md)
 - [v0.4.5 Apple Silicon 公开发行版](docs/RELEASE_0.4.5.md)

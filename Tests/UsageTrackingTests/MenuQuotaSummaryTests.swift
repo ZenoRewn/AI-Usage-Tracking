@@ -63,6 +63,15 @@ final class MenuQuotaSummaryTests: XCTestCase {
         XCTAssertEqual(stale.percentText,"99.0%", "Keep the last reading without presenting it as current")
     }
 
+    func testRingRepresentsReportedUsageRegardlessOfBrand() throws {
+        for tool in Tool.allCases {
+            for (percent,fraction) in [(0.0,0.0),(2.7,0.027),(21,0.21),(52,0.52),(86,0.86),(100,1.0),(125,1.0)] {
+                let summary = MenuQuotaSummary(tool:tool,quotas:[quota("window",tool:tool,percent:percent)],now:now)
+                XCTAssertEqual(try XCTUnwrap(summary.ringFraction),fraction,accuracy:0.000001)
+            }
+        }
+    }
+
     func testResetCountdownBoundariesAndMissingTime() {
         for (seconds, expected) in [(30.0,"不到 1 分钟后重置"),(60,"1m 后重置"),(3060,"51m 后重置"),(8280,"2h 18m 后重置"),(86399,"1 天后重置"),(86400,"1 天后重置"),(93600,"1 天 2h 后重置")] {
             let summary = MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:20,reset:now.addingTimeInterval(seconds))],now:now)

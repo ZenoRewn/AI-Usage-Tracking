@@ -19,6 +19,7 @@ import UsageCore
 struct BrandLogo: View {
     var tool: Tool
     var size: CGFloat = 18
+    var tint: Color? = nil
     var body: some View {
         Group {
             if let image = BrandImages.images[tool] {
@@ -26,7 +27,7 @@ struct BrandLogo: View {
             } else {
                 Text(Display.shortName(tool).prefix(1)).font(.system(size:size*0.7,weight:.bold))
             }
-        }.foregroundStyle(Display.color(tool)).frame(width:size,height:size).accessibilityLabel("\(tool.title) logo")
+        }.foregroundStyle(tint ?? Display.color(tool)).frame(width:size,height:size).accessibilityLabel("\(tool.title) logo")
     }
 }
 

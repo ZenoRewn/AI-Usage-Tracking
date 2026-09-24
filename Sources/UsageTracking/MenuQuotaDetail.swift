@@ -14,7 +14,7 @@ struct MenuQuotaDetail: View {
     var body: some View {
         VStack(alignment:.leading,spacing:14) {
             HStack {
-                BrandLogo(tool:summary.tool,size:19)
+                BrandLogo(tool:summary.tool,size:19,tint:MenuPalette.text)
                 Text("\(summary.tool.title) · 额度详情").font(.headline)
                 Spacer()
                 Button("完成") { dismiss() }.keyboardShortcut(.cancelAction)
@@ -48,7 +48,7 @@ struct MenuQuotaDetail: View {
                 }
             }
             Text("Author: Zeno Ren").font(.system(size:11)).foregroundStyle(.secondary)
-        }.padding(18).frame(width:360)
+        }.padding(18).frame(width:360).foregroundStyle(MenuPalette.text).tint(MenuPalette.accent).background(MenuPalette.card)
     }
 
     private func window(_ quota: QuotaWindow) -> some View {
