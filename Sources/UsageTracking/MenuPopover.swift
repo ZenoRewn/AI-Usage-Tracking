@@ -44,7 +44,7 @@ struct MenuPopover: View {
             HStack {
                 Button { show(.overview) } label: {
                     Text("打开工作台").font(.system(size:12,weight:.medium)).padding(.horizontal,10).padding(.vertical,6)
-                        .background(MenuPalette.card,in:RoundedRectangle(cornerRadius:7))
+                        .background(MenuPalette.card.opacity(0.55),in:RoundedRectangle(cornerRadius:7))
                         .contentShape(Rectangle())
                 }.buttonStyle(.plain)
                 Spacer()
@@ -53,7 +53,7 @@ struct MenuPopover: View {
             }
         }.padding(16).frame(width:464)
         .foregroundStyle(MenuPalette.text).tint(MenuPalette.accent)
-        .background(MenuPalette.background)
+        .modifier(MenuGlassSurface())
     }
     private func show(_ page: AppPage) {
         showWorkbench(page)

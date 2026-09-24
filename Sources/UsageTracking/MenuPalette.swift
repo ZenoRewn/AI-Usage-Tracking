@@ -1,7 +1,7 @@
 // Author: Zeno Ren
 import SwiftUI
 
-/// Menu surfaces follow the original design study, with readable light-mode equivalents.
+/// Tints follow the design study; the window surface remains system glass.
 enum MenuPalette {
     static let background = color(light:0xF8F8FA,dark:0x1C1D21)
     static let card = color(light:0xFFFFFF,dark:0x26272D)
@@ -21,5 +21,18 @@ enum MenuPalette {
                            green:Double((value >> 8) & 255) / 255,
                            blue:Double(value & 255) / 255,alpha:1)
         })
+    }
+}
+
+struct MenuGlassSurface: ViewModifier {
+    var cornerRadius: CGFloat = 20
+
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(macOS 26.0, *) {
+            content.glassEffect(.regular.tint(MenuPalette.background.opacity(0.12)),
+                                in:RoundedRectangle(cornerRadius:cornerRadius))
+        } else {
+            content.background(.ultraThinMaterial,in:RoundedRectangle(cornerRadius:cornerRadius))
+        }
     }
 }

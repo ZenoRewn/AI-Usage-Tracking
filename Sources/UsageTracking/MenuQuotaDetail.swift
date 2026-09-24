@@ -48,7 +48,8 @@ struct MenuQuotaDetail: View {
                 }
             }
             Text("Author: Zeno Ren").font(.system(size:11)).foregroundStyle(.secondary)
-        }.padding(18).frame(width:360).foregroundStyle(MenuPalette.text).tint(MenuPalette.accent).background(MenuPalette.card)
+        }.padding(18).frame(width:360).foregroundStyle(MenuPalette.text).tint(MenuPalette.accent)
+            .modifier(MenuGlassSurface(cornerRadius:16))
     }
 
     private func window(_ quota: QuotaWindow) -> some View {

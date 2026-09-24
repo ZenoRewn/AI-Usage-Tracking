@@ -71,7 +71,7 @@ struct MenuQuotaCard: View {
             }
         }.padding(.horizontal,8).padding(.vertical,6).frame(maxWidth:.infinity,alignment:.top)
         .foregroundStyle(MenuPalette.text)
-        .background(MenuPalette.card,in:RoundedRectangle(cornerRadius:12))
+        .background(MenuPalette.card.opacity(0.45),in:RoundedRectangle(cornerRadius:12))
         .overlay(RoundedRectangle(cornerRadius:12).strokeBorder(showingDetails ? MenuPalette.accent : .clear))
     }
 }

@@ -18,7 +18,7 @@ struct MenuUsageOverview: View {
                 HStack(spacing:2) {
                     metricButton(.tokens)
                     metricButton(.cost)
-                }.padding(2).background(MenuPalette.track,in:RoundedRectangle(cornerRadius:8))
+                }.padding(2).background(MenuPalette.track.opacity(0.55),in:RoundedRectangle(cornerRadius:8))
                     .accessibilityElement(children:.contain).accessibilityLabel("用量单位")
             }
             toolUsage
@@ -33,7 +33,7 @@ struct MenuUsageOverview: View {
         Button { metric = value } label: {
             Text(value.title).font(.system(size:11,weight:.medium)).padding(.horizontal,10).padding(.vertical,4)
                 .foregroundStyle(metric == value ? MenuPalette.text : MenuPalette.muted)
-                .background(metric == value ? MenuPalette.card : .clear,in:RoundedRectangle(cornerRadius:6))
+                .background(metric == value ? MenuPalette.card.opacity(0.75) : .clear,in:RoundedRectangle(cornerRadius:6))
                 .contentShape(Rectangle())
         }.buttonStyle(.plain).accessibilityValue(metric == value ? "已选" : "未选")
     }
