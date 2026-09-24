@@ -5,8 +5,6 @@ import UsageCore
 enum MenuUsageMetric {
     case tokens, cost
     var title: String { self == .tokens ? "Token" : "参考 USD" }
-    var toggleHint: String { self == .tokens ? "点击切换为参考成本（USD）" : "点击切换为 Token" }
-    mutating func toggle() { self = self == .tokens ? .cost : .tokens }
 }
 
 struct MenuUsageAmount {

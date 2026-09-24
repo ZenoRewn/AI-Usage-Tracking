@@ -2,6 +2,8 @@
 import Foundation
 import UsageCore
 
+enum QuotaPressure { case unknown, normal, warning, critical, stale }
+
 /// Independent quota windows are never summed into a fictional account percentage.
 struct MenuQuotaSummary {
     let tool: Tool
@@ -19,6 +21,44 @@ struct MenuQuotaSummary {
     var ringFraction: Double? { primary.map { min(1,max(0,$0.usedPercent / 100)) } }
     var percentText: String { primary.map { Self.percent($0.usedPercent) } ?? "—" }
     var hasStaleWindows: Bool { windows.contains { $0.isStale(at:now) } }
+    var pressure: QuotaPressure {
+        guard let primary else { return .unknown }
+        if primary.isStale(at:now) { return .stale }
+        return primary.usedPercent >= 90 ? .critical : primary.usedPercent >= 80 ? .warning : .normal
+    }
+    var windowText: String {
+        guard let primary else { return "尚未获取账户额度" }
+        return primary.title + (windows.count > 1 ? (primary.isStale(at:now) ? " · 旧窗口" : " · 最高有效窗口") : "")
+    }
+    func statusText(loading: Bool, error: String?) -> String {
+        if loading { return "正在查询" }
+        if error != nil { return "刷新失败" }
+        switch pressure {
+        case .unknown: return tool == .claude ? "等待额度快照" : "暂无额度"
+        case .stale: return "旧快照"
+        default:
+            if hasStaleWindows { return "含旧窗口" }
+            return pressure == .critical ? "接近或达到上限" : pressure == .warning ? "接近上限" : "已用"
+        }
+    }
+    var resetText: String {
+        guard let primary else { return "查看获取方式" }
+        return resetText(for:primary)
+    }
+    func resetText(for quota: QuotaWindow) -> String {
+        guard let reset = quota.resetsAt else { return "未提供重置时间" }
+        let seconds = reset.timeIntervalSince(now)
+        guard let minutes = Int(exactly:ceil(seconds / 60)) else { return "重置时间无效" }
+        guard seconds > 0 else { return "等待新窗口" }
+        guard !quota.isStale(at:now) else { return "重置时间待确认" }
+        if seconds < 60 { return "不到 1 分钟后重置" }
+        if minutes < 60 { return "\(minutes)m 后重置" }
+        if minutes < 1440 {
+            return "\(minutes / 60)h" + (minutes % 60 == 0 ? "" : " \(minutes % 60)m") + " 后重置"
+        }
+        let hours = minutes / 60
+        return "\(hours / 24) 天" + (hours % 24 == 0 ? "后重置" : " \(hours % 24)h 后重置")
+    }
     var amountText: String? {
         primary?.amounts.map { Self.compact($0.used) + " / " + Self.compact($0.total) }
     }
@@ -50,10 +90,10 @@ struct MenuQuotaSummary {
         }
         return sections.joined(separator:"\n\n")
     }
-    private static func percent(_ value: Double) -> String {
+    static func percent(_ value: Double) -> String {
         value.formatted(.number.locale(Locale(identifier:"en_US")).precision(.fractionLength(1))) + "%"
     }
-    private static func exact(_ value: Double?) -> String {
+    static func exact(_ value: Double?) -> String {
         value?.formatted(.number.locale(Locale(identifier:"en_US")).precision(.fractionLength(0...2))) ?? "—"
     }
     private static func compact(_ value: Double?) -> String {

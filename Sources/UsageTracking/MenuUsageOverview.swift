@@ -7,22 +7,25 @@ struct MenuUsageOverview: View {
     let usage: [ToolWindowUsage]
     let projects: TodayProjectSummary
     let projectName: (String) -> String
+    let openProject: (String) -> Void
     @State private var metric = MenuUsageMetric.tokens
+    @State private var selectedPeriod: String?
     var body: some View {
         VStack(alignment:.leading,spacing:10) {
             HStack {
-                Text("用量概览").font(.caption.weight(.semibold))
+                Text("本机用量").font(.caption.weight(.semibold))
                 Spacer()
-                Button { metric.toggle() } label: {
-                    HStack(spacing:4) { Text(metric.title); Image(systemName:"arrow.left.arrow.right").font(.system(size:8)) }
-                }.font(.system(size:10,weight:.medium)).buttonStyle(.plain).foregroundStyle(Display.blue)
-                    .accessibilityLabel("切换用量单位，当前为 " + metric.title).help(metric.toggleHint)
-                Image(systemName:"info.circle").font(.system(size:10)).foregroundStyle(.tertiary)
-                    .help("点击任意数字可切换整块概览的 Token / 参考成本。≈ 为估算；* 为部分用量未定价。悬停查看完整用量与各工具明细。Top 3 始终按 Token 排名。")
+                Picker("用量单位",selection:$metric) {
+                    Text("Token").tag(MenuUsageMetric.tokens)
+                    Text("参考 USD").tag(MenuUsageMetric.cost)
+                }.pickerStyle(.segmented).labelsHidden().frame(width:174)
             }
             toolUsage
+            if metric == .cost {
+                Text("≈ 公价估算 · * 部分定价 · 非订阅账单").font(.system(size:11)).foregroundStyle(.secondary)
+            }
             Divider().opacity(0.6)
-            MenuTopProjects(summary:projects,projectName:projectName,metric:metric,toggleMetric:{ metric.toggle() })
+            MenuTopProjects(summary:projects,projectName:projectName,metric:metric,openProject:openProject)
         }.padding(10)
         .background(.primary.opacity(0.025),in:RoundedRectangle(cornerRadius:10))
         .overlay(RoundedRectangle(cornerRadius:10).strokeBorder(.primary.opacity(0.055)))
@@ -34,7 +37,7 @@ struct MenuUsageOverview: View {
                 ForEach([1,7,30],id:\.self) { day in
                     Text(day == 1 ? "今天" : "\(day) 天").frame(width:74,alignment:.trailing)
                 }
-            }.font(.system(size:10)).foregroundStyle(.secondary)
+            }.font(.system(size:11)).foregroundStyle(.secondary)
             ForEach(usage) { row in
                 GridRow {
                     HStack(spacing:5) {
@@ -42,16 +45,24 @@ struct MenuUsageOverview: View {
                         Text(Display.shortName(row.tool)).font(.system(size:11,weight:.medium))
                     }.frame(maxWidth:.infinity,alignment:.leading)
                     ForEach(row.periods) { period in
-                        Button { metric.toggle() } label: {
+                        let key = row.tool.rawValue + ":" + String(period.days)
+                        Button { selectedPeriod = key } label: {
                             Text(MenuUsageAmount(period).text(for:metric))
                                 .font(.system(size:12,weight:.medium,design:.rounded)).monospacedDigit()
-                                .lineLimit(1).minimumScaleFactor(0.85).frame(width:74,height:18,alignment:.trailing)
+                                .lineLimit(1).minimumScaleFactor(0.85).frame(width:74,height:24,alignment:.trailing)
                                 .contentShape(Rectangle())
                         }.buttonStyle(.plain)
                         .accessibilityLabel("\(row.tool.title) \(period.days) 天，\(metric.title) \(MenuUsageAmount(period).text(for:metric))")
-                        .help(details(period,tool:row.tool) + "\n" + metric.toggleHint)
+                        .help("点击查看用量明细")
+                        .popover(isPresented:Binding(get:{ selectedPeriod == key },set:{ if !$0 { selectedPeriod = nil } })) {
+                            VStack(alignment:.leading,spacing:14) {
+                                HStack { Text("本机用量明细").font(.headline); Spacer(); Button("完成") { selectedPeriod = nil }.keyboardShortcut(.cancelAction) }
+                                Text(details(period,tool:row.tool)).font(.callout).textSelection(.enabled).fixedSize(horizontal:false,vertical:true)
+                                Text("Author: Zeno Ren").font(.system(size:11)).foregroundStyle(.secondary)
+                            }.padding(18).frame(width:330)
+                        }
                     }
-                }.frame(height:18)
+                }.frame(height:24)
             }
         }
     }

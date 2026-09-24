@@ -51,4 +51,44 @@ final class MenuQuotaSummaryTests: XCTestCase {
         XCTAssertTrue(summary.details.contains("重置时间已过"))
         XCTAssertTrue(summary.details.contains("采集于"))
     }
+
+    func testPressureThresholdsAndUnknownAreDistinctFromZero() {
+        XCTAssertEqual(MenuQuotaSummary(tool:.codex,quotas:[],now:now).pressure,.unknown)
+        for (value, expected) in [(0.0,QuotaPressure.normal),(79.9,.normal),(80,.warning),(89.9,.warning),(90,.critical),(125,.critical)] {
+            XCTAssertEqual(MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:value)],now:now).pressure,expected)
+        }
+        let stale = MenuQuotaSummary(tool:.codex,quotas:[quota("每周",percent:99,age:901)],now:now)
+        XCTAssertEqual(stale.pressure,.stale)
+        XCTAssertEqual(stale.statusText(loading:false,error:nil),"旧快照")
+        XCTAssertEqual(stale.percentText,"99.0%", "Keep the last reading without presenting it as current")
+    }
+
+    func testResetCountdownBoundariesAndMissingTime() {
+        for (seconds, expected) in [(30.0,"不到 1 分钟后重置"),(60,"1m 后重置"),(3060,"51m 后重置"),(8280,"2h 18m 后重置"),(86399,"1 天后重置"),(86400,"1 天后重置"),(93600,"1 天 2h 后重置")] {
+            let summary = MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:20,reset:now.addingTimeInterval(seconds))],now:now)
+            XCTAssertEqual(summary.resetText,expected)
+        }
+        let missing = MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:0)],now:now)
+        XCTAssertEqual(missing.resetText,"未提供重置时间")
+        let expired = MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:100,reset:now)],now:now)
+        XCTAssertEqual(expired.resetText,"等待新窗口")
+        let stale = MenuQuotaSummary(tool:.codex,quotas:[quota("每周",percent:60,age:901,reset:now.addingTimeInterval(3600))],now:now)
+        XCTAssertEqual(stale.resetText,"重置时间待确认")
+    }
+
+    func testVisibleStatusDoesNotMislabelUnknownAsDisconnectedOrHideFailure() {
+        let empty = MenuQuotaSummary(tool:.claude,quotas:[],now:now)
+        XCTAssertEqual(empty.statusText(loading:false,error:nil),"等待额度快照")
+        XCTAssertEqual(empty.statusText(loading:true,error:nil),"正在查询")
+        XCTAssertEqual(empty.statusText(loading:false,error:"offline"),"刷新失败")
+        let partial = MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:20),quota("每周",percent:99,age:901)],now:now)
+        XCTAssertEqual(partial.pressure,.normal)
+        XCTAssertEqual(partial.statusText(loading:false,error:nil),"含旧窗口")
+        XCTAssertEqual(partial.windowText,"5 小时 · 最高有效窗口")
+    }
+
+    func testOutOfRangeResetTimeIsReportedInsteadOfCrashingTheMenu() {
+        let invalid = MenuQuotaSummary(tool:.codex,quotas:[quota("5 小时",percent:20,reset:Date(timeIntervalSince1970:1e30))],now:now)
+        XCTAssertEqual(invalid.resetText,"重置时间无效")
+    }
 }

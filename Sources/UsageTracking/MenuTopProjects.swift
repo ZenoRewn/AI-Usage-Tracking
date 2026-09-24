@@ -6,14 +6,14 @@ struct MenuTopProjects: View {
     let summary: TodayProjectSummary
     let projectName: (String) -> String
     let metric: MenuUsageMetric
-    let toggleMetric: () -> Void
+    let openProject: (String) -> Void
     private var isToday: Bool { Calendar.current.isDateInToday(summary.dayStart) }
     var body: some View {
         VStack(alignment:.leading,spacing:6) {
             HStack {
-                Text("今日 Top 3 项目").font(.system(size:10,weight:.medium)).foregroundStyle(.secondary)
+                Text("今日 Top 3 项目").font(.system(size:11,weight:.medium)).foregroundStyle(.secondary)
                 Spacer()
-                if metric == .cost { Text("按 Token 排名").font(.system(size:9)).foregroundStyle(.tertiary) }
+                Text("按 Token 排名").font(.system(size:11)).foregroundStyle(.secondary)
             }
             if !isToday {
                 Text("正在更新今天的统计…").font(.caption).foregroundStyle(.secondary)
@@ -26,13 +26,15 @@ struct MenuTopProjects: View {
             }
             if isToday && summary.unassignedTokens > 0 {
                 Text("另有 \(Display.tokens(summary.unassignedTokens)) Tokens 未归属项目，未参与排名")
-                    .font(.system(size:9)).foregroundStyle(.secondary)
+                    .font(.system(size:11)).foregroundStyle(.secondary)
             }
         }
     }
     private func row(_ project: TodayProjectUsage, rank: Int) -> some View {
-        HStack(spacing:7) {
-            Text(String(rank)).font(.system(size:10,weight:.semibold,design:.rounded))
+        let amount = (metric == .tokens && project.hasApproximateDates ? "≈" : "") + MenuUsageAmount(project).text(for:metric)
+        return Button { openProject(project.project) } label: {
+          HStack(spacing:7) {
+            Text(String(rank)).font(.system(size:11,weight:.medium,design:.rounded))
                 .foregroundStyle(Display.purple).frame(width:10,alignment:.leading)
             Text(projectName(project.project)).font(.system(size:11,weight:.medium)).lineLimit(1).truncationMode(.middle)
             Spacer(minLength:0)
@@ -42,21 +44,14 @@ struct MenuTopProjects: View {
                         .accessibilityLabel("\(tool.tool.title) · \(tool.tokens.formatted()) Tokens")
                 }
             }
-            amountButton(project)
-        }.frame(height:18).contentShape(Rectangle())
-        .accessibilityElement(children:.contain).help(details(project) + "\n" + metric.toggleHint)
-    }
-    private func amountButton(_ project: TodayProjectUsage) -> some View {
-        let amount = MenuUsageAmount(project).text(for:metric)
-        let prefix = metric == .tokens && project.hasApproximateDates ? "≈" : ""
-        let label = projectName(project.project) + " " + metric.title + " " + amount
-        let helpText = details(project) + "\n" + metric.toggleHint
-        return Button(action:toggleMetric) {
-            Text(prefix + amount)
+            Text(amount)
                 .font(.system(size:12,weight:.semibold,design:.rounded)).monospacedDigit()
-                .lineLimit(1).minimumScaleFactor(0.85).frame(width:74,height:18,alignment:.trailing)
-                .contentShape(Rectangle())
-        }.buttonStyle(.plain).accessibilityLabel(Text(label)).help(Text(helpText))
+                .lineLimit(1).minimumScaleFactor(0.85).frame(width:74,alignment:.trailing)
+            Image(systemName:"chevron.right").font(.system(size:10)).foregroundStyle(.secondary)
+          }.frame(height:26).contentShape(Rectangle())
+        }.buttonStyle(.plain)
+        .accessibilityLabel("查看今日项目 \(projectName(project.project))，\(metric.title) \(amount)")
+        .help(details(project) + "\n点击打开该项目今天的记录。")
     }
     private func details(_ project: TodayProjectUsage) -> String {
         let path = project.project.replacingOccurrences(of:FileManager.default.homeDirectoryForCurrentUser.path,with:"~")

@@ -10,6 +10,7 @@ Design research references (all with MIT top-level licenses at the inspected rev
 - token-tracker — stormzhang — https://github.com/stormzhang/token-tracker
 - usage-monitor — lollapalooza; upstream aqua5230/usage — https://github.com/yanowo/usage-monitor
 - coding-tool — https://github.com/CooperJiang/coding-tool
+- CodeNotch — Vinz — https://github.com/vinzdg/codenotch — reference revision 731a23d8e057862c2ff151bde8e8d9274f5e950a; quota-ring hierarchy and progressive disclosure informed v0.5.0. No implementation code or design images are redistributed.
 
 SQLite is supplied by macOS; the SQLite project places its source in the public domain: https://sqlite.org/copyright.html.
 

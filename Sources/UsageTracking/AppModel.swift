@@ -50,9 +50,10 @@ struct DailyUsage: Identifiable {
     private var started = false
     private var notified: Set<String> = []
 
-    init() {
-        dataDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Usage Tracking")
+    init(dataDirectory: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Usage Tracking"), collectsUsage: Bool = true) {
+        self.dataDirectory = dataDirectory
         config = AppConfiguration.load(from: dataDirectory)
+        guard collectsUsage else { scanner = nil; return }
         do { scanner = try UsageScanner(dataDirectory: dataDirectory) }
         catch { scanner = nil; self.error = error.localizedDescription }
     }
@@ -147,6 +148,23 @@ struct DailyUsage: Identifiable {
         }
     }
     func clientID(_ event: UsageEvent) -> String { event.tool.rawValue + ":" + ClientAnalytics.clientName(event) }
+    func selectMenuProject(_ path: String, dayStart: Date, now: Date = Date(), calendar: Calendar = .current) {
+        selectedPage = .projects
+        rangeDays = 1; selectedTool = "all"; selectedClient = "all"; search = ""
+        selectedGroup = nil
+        guard dayStart == calendar.startOfDay(for:now) else {
+            statusMessage = "日期已切换，请查看今天的项目。"
+            return
+        }
+        let rows = snapshot.events.filter { $0.project == path && $0.date >= dayStart && $0.date <= now }
+            .sorted { $0.date > $1.date }
+        guard !path.isEmpty, !rows.isEmpty else {
+            statusMessage = "该项目今天暂时没有可显示的记录。"
+            return
+        }
+        statusMessage = "今日项目 · " + projectName(path)
+        selectedGroup = UsageGroup(id:path,name:projectName(path),events:rows)
+    }
     var clientOptions: [(id:String,title:String)] {
         var options: [String:String] = [:]
         for event in snapshot.events where selectedTool == "all" || event.tool.rawValue == selectedTool { options[clientID(event)] = ClientAnalytics.clientName(event) }
